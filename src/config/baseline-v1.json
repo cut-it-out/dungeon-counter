@@ -1,0 +1,15 @@
+{
+  "id": "baseline-v1",
+  "sessionSeconds": 300,
+  "startCoins": 20,
+  "startStock": 5,
+  "shelfCap": 20,
+  "restockCost": 10,
+  "restockBatch": 5,
+  "salePrice": 5,
+  "customerInterval": 3,
+  "upgradeBaseCost": 50,
+  "upgradeCostGrowth": 1.5,
+  "upgradePriceStep": 2,
+  "rankThresholds": { "bronze": 500, "silver": 1500, "gold": 3000 }
+}
