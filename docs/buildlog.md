@@ -6,6 +6,13 @@ Running record of how this project was built with Claude Code. "I" is the develo
 
 - Agent behavior: Claude Code makes surgical edits only, runs tests right after every change, prefers explicit code over abstractions, asks instead of guessing when requirements are unclear, and presents 2-3 options with trade-offs before writing code when several patterns are valid. The rules are in CLAUDE.md under "Agent Behavior" (directed, Session 1).
 - Build log: `docs/buildlog.md` in the attributed voice. It is read at the start of every session and written at the end, as stated in CLAUDE.md (directed, Session 1).
+- Game: a five-minute potion-stall idle sim for a fictional client (Pocket Lantern Games); brief in `docs/BRIEF_dungeon-counter-idle-sim.md`, palette in `docs/dungeon-counter-brand-palette.md`. The spec is `docs/GDD-dungeon-counter-v3.md`; v1 and v2 are kept for provenance (directed, Session 2).
+- Stack & hosting: Phaser + Vite + TypeScript, Vitest for the economy; mobile portrait 390×844; Cloudflare Pages via Git integration; GitHub `cut-it-out/dungeon-counter` (proposed → accepted, Session 2).
+- Economy: one product, one "Better Brews" upgrade (+price per level), fixed-batch restock, deterministic customer tick, 300 s of game time that pauses when hidden; pure TypeScript module driven by both Phaser and a full-session policy test (directed, Session 2).
+- Baseline: `baseline-v1` numbers were proposed by Claude Code without simulation and are frozen; tuning goes in `revised-v1`. Provenance = this log's Session 2 + the unmodified v1 GDD in commit `94bf7af` (directed, Session 2).
+- Dead-shop guard: an upgrade is blocked only when it would leave `stock == 0` and `coins < restockCost` (directed, Session 2).
+- Evidence: ≥1 (target 2) played runs per config with a shared manual policy; CSV with `run_id`/`run_type`; one SQL aggregation (engine TBD, DuckDB suggested); idle time, action spacing, first-upgrade time, revenue/minute, surplus, missed sales as metrics; medals P2; simulator CLI P2 (directed, Session 2).
+- Time box: ~3 days (18–24 h), one day over the brief; stated in the case study (directed, Session 2).
 
 ## Part 2 — Sessions
 
@@ -13,9 +20,11 @@ Running record of how this project was built with Claude Code. "I" is the develo
 
 (Keep current; every session updates this list.)
 
-- Project scope undefined (Session 1): the repo has no README, code or description of what dungeon-counter is. Before any code: decide what it does, the tech stack and the test command, then add them to CLAUDE.md and Part 1.
-- No test command (Session 1): the "Verification First" rule in CLAUDE.md can't be followed until a test setup exists. Pick one together with the tech stack.
-- Nothing committed yet (Session 1): `main` has no commits. CLAUDE.md and this log are uncommitted.
+- No execution plan yet (Session 2): GDD v3 (`docs/GDD-dungeon-counter-v3.md`) is final; the plan to build it is the next deliverable and needs my review before code.
+- No test command yet (Session 2): the stack is Vite + TypeScript + Vitest, but no scaffold exists. Once `npm test` works, replace "none yet" in CLAUDE.md's build-log block and add the stack to CLAUDE.md.
+- Rank thresholds unvalidated (Session 2): `rankThresholds` in `baseline-v1` (500/1500/3000) are presentation values; Gold is provably unreachable (GDD §5). Medals are P2; set thresholds from played runs, don't edit the frozen baseline.
+- Cloudflare Pages not connected (Session 2): I need to connect the GitHub repo in the Cloudflare dashboard once a build exists (build command and output dir come from the execution plan).
+- CC0 asset selection pending (Session 2): pick a few Kenney Roguelike/RPG and UI Pack sprites during the build; record each in `CREDITS.md` with creator, pack, URL and licence.
 
 ### Session 1 — Tuesday 20 October 2026 — Project init: agent rules and build log
 
@@ -34,3 +43,29 @@ Running record of how this project was built with Claude Code. "I" is the develo
 - **Learned:** Writing the working rules down before any code exists means the first real session already runs under them.
 - **Where things stand / next step:** Branch `main`, no commits. `CLAUDE.md` and `docs/buildlog.md` are uncommitted. Tests: none exist. Next step: define what dungeon-counter is, choose the tech stack and test command, and make the first commit.
 - **Showcase line:** I started dungeon-counter from an empty repo by writing down how Claude Code should work (small edits, tests after every change, ask before guessing) and setting up a build log, so every later session follows the same rules and picks up where the last one stopped.
+
+### Session 2 — Tuesday 20 October 2026 — Brief, git init and the GDD (v1 → v3)
+
+- **Goal:** read the brief, finish the git setup and produce a Game Design Document for my review, as the first step before an execution plan (my request).
+- **Direction given:** "lets build a game. please find the BRIEF in the docs. read it and ask questions." · "first lets create a game design document (GDD), which I will review, then based on that GDD we will create an execution plan." · "the game will be hosted on Cloudflare Pages and the code on is on GitHub (already have the repo setup), please finish initializing the git repo and lets go." · On art direction: "use the just added brand palette and ask questions if you still need directions". · After my review: "please rename the GDD.md to GDD-dungeon-counter-v1.md … review them and let me know if you would challange any change in it." · Then: "lets create the final v3 with your proposed review changes. for change 3 I would also go with option B."
+- **Course corrections:** Claude Code's v1 GDD committed to "everything in sections 3–10" with a full simulator and several analytics outputs. I rewrote it by hand as v2 with P0/P1/P2 priorities, an upgrade solvency guard, exact scheduling rules, per-config saves, `run_id`/`run_type` CSV columns, medals moved to P2, the simulator made optional and the idle-gap metrics replaced with action-spacing proxies. Claude Code then challenged three of my v2 changes: (1) the idle-gap metrics *are* computable from the CSV rows, since every state change is a row; (2) the simulator is cheapest as a Vitest full-session policy test rather than a cut feature; (3) the always-on upgrade reserve was broader than the soft lock it fixed and would hide "going broke" in the baseline evidence. I accepted all three, choosing option B (narrow dead-shop guard) over A (keep the reserve) and C (no guard, log a `stuck` event).
+- **What was built:** (1) `.gitignore`; first commit `d004bfa` pushed to `origin/main`. (2) `docs/GDD-dungeon-counter-v1.md`: Claude Code's draft, with the AI-proposed baseline economy, written before any calculation or play. (3) `docs/GDD-dungeon-counter-v2.md`: my hand-written review revision. (4) `docs/GDD-dungeon-counter-v3.md`: v2 plus the six accepted review changes, with a v2→v3 change log in section 14. All three committed as `94bf7af` (831 lines added).
+- **Decisions:**
+  - [proposed → accepted] Ranked summary at 5:00 with no fail state, rank from gross sales revenue; medals deferred to P2 until thresholds come from data. Alternatives: coin-goal win/lose; score only.
+  - [proposed → accepted] The one upgrade ("Better Brews") raises the sale price per level. Alternatives: faster customers; cheaper restock.
+  - [proposed → accepted] Claude Code proposes the `baseline-v1` numbers from intuition, labelled as AI-proposed, frozen before any play: start 20c/5 potions, shelf 20, restock 5 for 10c, sale 5c, customer every 3 s, upgrade 50c × 1.5^L for +2c. Alternatives: a separate fresh AI session; me picking them.
+  - [proposed → accepted] Phaser + Vite + TypeScript + Vitest. Alternatives: plain JS; Phaser from CDN with no build.
+  - [proposed → accepted] GDD as Markdown in `docs/`. Alternative: a Claude Doc.
+  - [proposed → accepted] Cloudflare Pages Git integration for deploys. Alternative: GitHub Actions + Wrangler.
+  - [directed] 3-day (18–24 h) time box instead of the brief's 2 days; the case study states the deviation (v2).
+  - [directed] P0/P1/P2 priorities, fixed-batch restock with precise "Need 5 free slots" wording, per-config `localStorage` keys, `run_id`/`run_type` columns, a shared manual play policy for evidence runs (v2).
+  - [directed] Dead-shop guard, option B: an upgrade is blocked only when it would leave `stock == 0` and `coins < restockCost`.
+  - [proposed → accepted] Idle time and unspent surplus restored as primary metrics (computable from rows via `LEAD`); "action spacing" kept as the strategy-dependent proxy.
+  - [proposed → accepted] The full-session policy test is P0; only a CSV-writing simulator CLI is P2.
+  - [Claude's call] The Gold bound in GDD §5: revenue ≤ 100 × final price, so Gold needs level ≥ 13 (≈ 19,000c of upgrades); unreachable on the baseline. The frozen numbers are untouched.
+- **What broke or was wrong:** v1 claimed the idle metrics were derivable; v2 said they weren't; v3 settles it with the mechanism (state is constant between rows). No code yet, so nothing broke.
+- **Hand edits:** I added `docs/BRIEF_dungeon-counter-idle-sim.md` and `docs/dungeon-counter-brand-palette.md` before the session, and wrote `docs/GDD-dungeon-counter-v2.md` between turns.
+- **Testing / playtest notes:** None. No code exists; tests not run.
+- **Learned:** A reviewer's "not computable" claim is worth checking against the data model: when every state change is logged, piecewise-constant state makes interval metrics a window function, not a new data stream.
+- **Where things stand / next step:** Branch `main` at `94bf7af`, pushed through `d004bfa`; `94bf7af` and this log entry are not yet pushed. Tests: none exist. GDD v3 is final. Next step: write the execution plan from GDD v3 (project scaffold, pure economy module + policy test, Phaser scenes, save/CSV, SQL + balancing, Pages deploy) for my review before any code.
+- **Showcase line:** With only a fictional founder's email to go on, I had Claude Code draft a GDD with a frozen AI-proposed economy, rewrote it myself into a prioritised three-day spec, then let Claude Code challenge my revision and accepted the three changes that held up: the idle-time metric is computable after all, the simulator is a test not a feature, and the solvency guard should block only a true dead shop.
