@@ -86,6 +86,31 @@ export function restock(state: EconomyState, cfg: EconomyConfig): EconomyEvent |
   return makeEvent(state, cfg, 'restock', -cfg.restockCost);
 }
 
+export interface SessionSummary {
+  revenue: number; // gross sales revenue
+  restockSpend: number;
+  upgradeSpend: number;
+  sold: number;
+  missed: number;
+  upgradeLevel: number;
+  closing: number; // closing coin balance
+}
+
+// Summary screen numbers (GDD §3/§5), derived from the event log alone.
+export function summarize(cfg: EconomyConfig, events: EconomyEvent[]): SessionSummary {
+  const sum = (type: string) => events.filter((e) => e.event === type).reduce((s, e) => s + e.amount, 0);
+  const last = events[events.length - 1];
+  return {
+    revenue: sum('sale'),
+    restockSpend: -sum('restock'),
+    upgradeSpend: -sum('upgrade'),
+    sold: events.filter((e) => e.event === 'sale').length,
+    missed: events.filter((e) => e.event === 'missed_sale').length,
+    upgradeLevel: last ? last.upgradeLevel : 0,
+    closing: last ? last.coins : cfg.startCoins,
+  };
+}
+
 export function upgrade(state: EconomyState, cfg: EconomyConfig): EconomyEvent | null {
   if (state.finished || !canUpgrade(state, cfg).ok) return null;
   const cost = upgradeCostAt(cfg, state.upgradeLevel);
