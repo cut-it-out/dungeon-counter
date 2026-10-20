@@ -1,0 +1,321 @@
+/* Palette: docs/dungeon-counter-brand-palette.md */
+:root {
+  --ink: #222836;
+  --gold: #e8b85b;
+  --jade: #39a68d;
+  --parchment: #f3e6c9;
+  --copper: #b85c42;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  height: 100%;
+  background: var(--ink);
+  color: var(--parchment);
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  -webkit-tap-highlight-color: transparent;
+}
+
+button {
+  font: inherit;
+  touch-action: manipulation;
+}
+
+/* Page = flex column HUD / scene / controls; the layers never overlap (plan decision B). */
+#app {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  height: 100dvh;
+  max-width: 480px;
+  margin: 0 auto;
+  overflow: hidden;
+}
+
+#hud {
+  flex: none;
+  padding: max(10px, env(safe-area-inset-top)) 16px 4px;
+}
+
+.hud-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.counter {
+  display: flex;
+  flex-direction: column;
+}
+
+.counter-label {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  opacity: 0.8;
+}
+
+.counter-value {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 26px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.coin {
+  color: var(--gold);
+}
+
+.potion {
+  color: var(--jade);
+}
+
+.dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.coin-dot {
+  background: var(--gold);
+}
+
+.potion-dot {
+  background: var(--jade);
+  border-radius: 3px 3px 7px 7px;
+}
+
+.icon-btn {
+  margin-left: auto;
+  width: 48px;
+  height: 48px;
+  border: 2px solid var(--parchment);
+  border-radius: 10px;
+  background: transparent;
+  color: var(--parchment);
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.timer {
+  text-align: center;
+  font-size: 22px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+#scene {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+#controls {
+  flex: none;
+  padding: 10px 16px max(16px, env(safe-area-inset-bottom));
+  border-top: 2px solid var(--copper);
+}
+
+.upgrade-card {
+  background: var(--parchment);
+  color: var(--ink);
+  border: 2px solid var(--copper);
+  border-radius: 10px;
+  padding: 8px 12px;
+}
+
+.upgrade-head {
+  display: flex;
+  justify-content: space-between;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.upgrade-info {
+  font-size: 15px;
+  font-variant-numeric: tabular-nums;
+  margin-top: 2px;
+}
+
+.actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.action-btn {
+  width: 100%;
+  min-height: 64px;
+  border: 2px solid transparent;
+  border-radius: 12px;
+  color: var(--ink);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  cursor: pointer;
+}
+
+.action-btn.restock {
+  background: var(--jade);
+}
+
+.action-btn.upgrade {
+  background: var(--gold);
+}
+
+.action-btn:disabled {
+  background: transparent;
+  color: var(--parchment);
+  border-style: dashed;
+  cursor: default;
+}
+
+.action-btn.restock:disabled {
+  border-color: var(--jade);
+}
+
+.action-btn.upgrade:disabled {
+  border-color: var(--gold);
+}
+
+.action-label {
+  font-size: 17px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.action-cost {
+  font-size: 16px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.reason {
+  min-height: 20px;
+  margin-top: 4px;
+  font-size: 14px;
+  text-align: center;
+}
+
+/* Full-screen modal panels: title, pause, summary. */
+.panel {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background: rgba(34, 40, 54, 0.94);
+}
+
+.panel[hidden] {
+  display: none;
+}
+
+.panel-body {
+  width: 100%;
+  max-width: 360px;
+  text-align: center;
+}
+
+.card {
+  background: var(--parchment);
+  color: var(--ink);
+  border: 3px solid var(--copper);
+  border-radius: 14px;
+  padding: 20px;
+}
+
+.game-title {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-weight: 700;
+  font-size: 40px;
+  color: var(--gold);
+  margin: 0 0 12px;
+}
+
+.tagline {
+  margin: 0 0 28px;
+  line-height: 1.4;
+}
+
+.muted {
+  opacity: 0.75;
+  font-size: 14px;
+}
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.stack[hidden] {
+  display: none;
+}
+
+.panel-btn {
+  width: 100%;
+  min-height: 56px;
+  border: 2px solid var(--ink);
+  border-radius: 12px;
+  background: transparent;
+  color: inherit;
+  font-size: 18px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.panel-btn.primary {
+  background: var(--gold);
+  border-color: var(--gold);
+  color: var(--ink);
+}
+
+.panel-btn.danger {
+  border-color: var(--copper);
+}
+
+#title-panel .panel-btn {
+  border-color: var(--parchment);
+}
+
+.summary-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 8px 0 20px;
+  font-size: 17px;
+}
+
+.summary-table th {
+  text-align: left;
+  font-weight: 500;
+  padding: 6px 0;
+}
+
+.summary-table td {
+  text-align: right;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.summary-table tr.total th,
+.summary-table tr.total td {
+  border-top: 2px solid var(--copper);
+  font-weight: 800;
+  padding-top: 10px;
+}

@@ -3,11 +3,92 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#222836" />
     <title>Dungeon Counter</title>
   </head>
   <body>
     <div id="app">
+      <header id="hud">
+        <div class="hud-row">
+          <div class="counter" aria-label="Coins">
+            <span class="counter-label">Coins</span>
+            <span class="counter-value coin"><span class="dot coin-dot" aria-hidden="true"></span><span id="coins">0c</span></span>
+          </div>
+          <div class="counter" aria-label="Stock">
+            <span class="counter-label">Stock</span>
+            <span class="counter-value potion"><span class="dot potion-dot" aria-hidden="true"></span><span id="stock">0/0</span></span>
+          </div>
+          <button id="pause-btn" class="icon-btn" type="button" aria-label="Pause">II</button>
+        </div>
+        <div id="timer" class="timer" aria-label="Time left">5:00</div>
+      </header>
+
       <div id="scene"></div>
+
+      <section id="controls">
+        <div class="upgrade-card">
+          <div class="upgrade-head"><span>Better Brews</span><span id="upgrade-level">Lv 0</span></div>
+          <div id="upgrade-info" class="upgrade-info">Price 5c → 7c · cost 50c</div>
+        </div>
+        <div class="actions">
+          <div class="action">
+            <button id="restock-btn" class="action-btn restock" type="button">
+              <span id="restock-label" class="action-label">Restock +5</span>
+              <span id="restock-cost" class="action-cost">10c</span>
+            </button>
+            <div id="restock-reason" class="reason" aria-live="polite"></div>
+          </div>
+          <div class="action">
+            <button id="upgrade-btn" class="action-btn upgrade" type="button">
+              <span class="action-label">Upgrade</span>
+              <span id="upgrade-cost" class="action-cost">50c</span>
+            </button>
+            <div id="upgrade-reason" class="reason" aria-live="polite"></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="title-panel" class="panel" hidden>
+        <div class="panel-body">
+          <h1 class="game-title">Dungeon Counter</h1>
+          <p class="tagline">Run the potion stall at the mouth of the dungeon for one five-minute day.</p>
+          <button id="new-day-btn" class="panel-btn primary" type="button">New day</button>
+        </div>
+      </section>
+
+      <section id="pause-panel" class="panel" hidden>
+        <div class="panel-body card">
+          <h2>Paused</h2>
+          <p id="pause-config" class="muted"></p>
+          <div id="pause-menu" class="stack">
+            <button id="resume-btn" class="panel-btn primary" type="button">Resume</button>
+            <button id="reset-btn" class="panel-btn" type="button">Reset run</button>
+          </div>
+          <div id="reset-confirm" class="stack" hidden>
+            <p>Discard this run and go back to the title?</p>
+            <button id="reset-cancel-btn" class="panel-btn primary" type="button">Keep playing</button>
+            <button id="reset-yes-btn" class="panel-btn danger" type="button">Reset run</button>
+          </div>
+        </div>
+      </section>
+
+      <section id="summary-panel" class="panel" hidden>
+        <div class="panel-body card">
+          <h2>Shop closed</h2>
+          <table class="summary-table">
+            <tbody>
+              <tr><th>Sales revenue</th><td id="sum-revenue"></td></tr>
+              <tr><th>Restock spending</th><td id="sum-restock"></td></tr>
+              <tr><th>Upgrade spending</th><td id="sum-upgrade"></td></tr>
+              <tr><th>Potions sold</th><td id="sum-sold"></td></tr>
+              <tr><th>Missed sales</th><td id="sum-missed"></td></tr>
+              <tr><th>Better Brews level</th><td id="sum-level"></td></tr>
+              <tr class="total"><th>Closing balance</th><td id="sum-closing"></td></tr>
+            </tbody>
+          </table>
+          <button id="summary-new-day-btn" class="panel-btn primary" type="button">New day</button>
+        </div>
+      </section>
     </div>
     <script type="module" src="/src/main.ts"></script>
   </body>

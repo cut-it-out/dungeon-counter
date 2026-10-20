@@ -96,3 +96,10 @@ Running record of how this project was built with Claude Code. "I" is the develo
 ### Session 4 — Tuesday 20 October 2026 — (in progress)
 
 - [direction] "lets execute the plan. do the steps one-by-one after each other. once it is confirmed move to the next one. take notes of any deviation/questions on the way and let me know once you are done. stop only after you delivered day 1 (after S5a)." — start of plan execution, S1 → S5a.
+- [decision] S1: Phaser pinned to 3.90.0 (latest 3.x) because the plan says "phaser 3.x"; npm latest is 4.2.1. TypeScript 7.0.2, Vite 8.3.4, Vitest 5.0.5. Vitest 5 hides console output from passing tests, so `silent: false` is set for the S4 policy line.
+- [decision] S3: restock reports `need_slots` before `need_coins`; upgrade reports `need_coins` before `dead_shop_guard` (Claude's call).
+- [decision] S4: policy restocks at `stock <= 1` (the literal `stock == 1` never restocks an emptied shelf) and checks restock before upgrade when both are possible (Claude's call; open question for the played runs).
+- [finding] S4: the narrow dead-shop guard can still be beaten at stock 1: coins 52, upgrade 50c → 2c, last sale +7c → stock 0, coins 9. The policy test passes only because restock is checked first. Not changed; raised with me as a question.
+- [decision] S5: the Phaser game is 390×400 design px (`SCENE_WIDTH`/`SCENE_HEIGHT` in `src/scenes/Play.ts`), FIT-scaled inside the middle flex box; 390×844 is the page, not the canvas (follows from decision B). Title/Summary scenes are thin routers; their content is DOM in `index.html` + `src/ui/overlay.ts`. Pause menu has Resume + Reset run (two-step confirm); Export CSV waits for S8, save status for S7 (Claude's call).
+- [decision] S5: "Need Nc" shows the action's full cost (e.g. "Need 75c" for the upgrade), not the shortfall (Claude's call; open question).
+- [decision] S5a: the Roguelike/RPG Pack has no characters, so Kenney's Roguelike Characters pack (CC0) was fetched as a third pack for the adventurer. Nothing shortlisted from the UI Pack (vector style; overlay is CSS). 13 candidates in `public/assets/candidates/`.
