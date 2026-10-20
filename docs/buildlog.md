@@ -11,7 +11,10 @@ Running record of how this project was built with Claude Code. "I" is the develo
 - Economy: one product, one "Better Brews" upgrade (+price per level), fixed-batch restock, deterministic customer tick, 300 s of game time that pauses when hidden; pure TypeScript module driven by both Phaser and a full-session policy test (directed, Session 2).
 - Baseline: `baseline-v1` numbers were proposed by Claude Code without simulation and are frozen; tuning goes in `revised-v1`. Provenance = this log's Session 2 + the unmodified v1 GDD in commit `94bf7af` (directed, Session 2).
 - Dead-shop guard: an upgrade is blocked only when it would leave `stock == 0` and `coins < restockCost` (directed, Session 2).
-- Evidence: ≥1 (target 2) played runs per config with a shared manual policy; CSV with `run_id`/`run_type`; one SQL aggregation (engine TBD, DuckDB suggested); idle time, action spacing, first-upgrade time, revenue/minute, surplus, missed sales as metrics; medals P2; simulator CLI P2 (directed, Session 2).
+- Execution plan: `docs/PLAN-dungeon-counter-v1.md` (S1–S18 + S5a), approved (directed, Session 3).
+- UI rendering: Phaser draws only the shop scene; HUD, buttons, menus and summary are an HTML overlay in a CSS flex column (proposed → accepted, Session 3).
+- Assets: Claude Code fetches and shortlists Kenney CC0 sprites; I confirm (directed, Session 3).
+- Evidence: ≥1 (target 2) played runs per config with a shared manual policy; CSV with `run_id`/`run_type`; one SQL aggregation via DuckDB, run with `uv run --with duckdb balancing/run_sql.py` (directed, Session 3); idle time, action spacing, first-upgrade time, revenue/minute, surplus, missed sales as metrics; medals P2; simulator CLI P2 (directed, Session 2).
 - Time box: ~3 days (18–24 h), one day over the brief; stated in the case study (directed, Session 2).
 
 ## Part 2 — Sessions
@@ -20,11 +23,11 @@ Running record of how this project was built with Claude Code. "I" is the develo
 
 (Keep current; every session updates this list.)
 
-- No execution plan yet (Session 2): GDD v3 (`docs/GDD-dungeon-counter-v3.md`) is final; the plan to build it is the next deliverable and needs my review before code.
-- No test command yet (Session 2): the stack is Vite + TypeScript + Vitest, but no scaffold exists. Once `npm test` works, replace "none yet" in CLAUDE.md's build-log block and add the stack to CLAUDE.md.
+- Execution not started (Session 3): `docs/PLAN-dungeon-counter-v1.md` is approved; start at S1. Follow its step order; each step's ✔ line is the check that closes it.
+- No test command yet (Session 2): the stack is Vite + TypeScript + Vitest, but no scaffold exists. Plan S1 makes `npm test` green, then replaces "none yet" in CLAUDE.md's build-log block and adds the stack and commands to CLAUDE.md.
 - Rank thresholds unvalidated (Session 2): `rankThresholds` in `baseline-v1` (500/1500/3000) are presentation values; Gold is provably unreachable (GDD §5). Medals are P2; set thresholds from played runs, don't edit the frozen baseline.
 - Cloudflare Pages not connected (Session 2): I need to connect the GitHub repo in the Cloudflare dashboard once a build exists (build command and output dir come from the execution plan).
-- CC0 asset selection pending (Session 2): pick a few Kenney Roguelike/RPG and UI Pack sprites during the build; record each in `CREDITS.md` with creator, pack, URL and licence.
+- CC0 asset selection pending (Session 2, method set in Session 3): plan step S5a: Claude Code fetches the Kenney packs, shortlists into `public/assets/candidates/`, I confirm; record each kept file in `CREDITS.md` with creator, pack, URL and licence.
 
 ### Session 1 — Tuesday 20 October 2026 — Project init: agent rules and build log
 
@@ -67,5 +70,25 @@ Running record of how this project was built with Claude Code. "I" is the develo
 - **Hand edits:** I added `docs/BRIEF_dungeon-counter-idle-sim.md` and `docs/dungeon-counter-brand-palette.md` before the session, and wrote `docs/GDD-dungeon-counter-v2.md` between turns.
 - **Testing / playtest notes:** None. No code exists; tests not run.
 - **Learned:** A reviewer's "not computable" claim is worth checking against the data model: when every state change is logged, piecewise-constant state makes interval metrics a window function, not a new data stream.
-- **Where things stand / next step:** Branch `main` at `94bf7af`, pushed through `d004bfa`; `94bf7af` and this log entry are not yet pushed. Tests: none exist. GDD v3 is final. Next step: write the execution plan from GDD v3 (project scaffold, pure economy module + policy test, Phaser scenes, save/CSV, SQL + balancing, Pages deploy) for my review before any code.
+- **Where things stand / next step:** Branch `main` at `6412881` (this entry's commit), pushed to origin. Tests: none exist. GDD v3 is final. Next step: write the execution plan from GDD v3 (project scaffold, pure economy module + policy test, Phaser scenes, save/CSV, SQL + balancing, Pages deploy) for my review before any code.
 - **Showcase line:** With only a fictional founder's email to go on, I had Claude Code draft a GDD with a frozen AI-proposed economy, rewrote it myself into a prioritised three-day spec, then let Claude Code challenge my revision and accepted the three changes that held up: the idle-time metric is computable after all, the simulator is a test not a feature, and the solvency guard should block only a true dead shop.
+
+### Session 3 — Tuesday 20 October 2026 — Execution plan from GDD v3
+
+- **Goal:** turn GDD v3 into an execution plan I can review before any code (my request, and Session 2's next step).
+- **Direction given:** "then commit the v3 GDD and move to the execution planning phase. Once you have the plan please stop so I can review." · On the plan's open decisions: "1: duckdb with uv run and a tiny runner" · "2: what is the pro/con for this/that option?" · "3: you fetch and shortlist, I confirm/choose" · "once you answer/update the docs I'll still need to review" · "ok, thanks, lets go with Phaser scene + HTML overlay" · "looks ok, lets wrap this up and I'll ask you to execute from another session later".
+- **Course corrections:** Claude Code recommended that I download the Kenney packs myself and it would shortlist by name; I asked for the reverse: Claude Code fetches and shortlists, I confirm or choose. On UI rendering I asked for the full pro/con before deciding rather than taking the recommendation as given.
+- **What was built:** `docs/PLAN-dungeon-counter-v1.md`: 18 steps plus S5a over the GDD's three days, each with a P0/P1/P2 tag, files touched and a verification command; a repo layout; my five hands-on steps collected (S5a sprite confirmation, S10 phone smoke test, S11 Cloudflare dashboard, S12/S15 played evidence runs) with exact Pages settings (`npm run build`, output `dist`, `NODE_VERSION=24`); a list of known gotchas (frame-delta cap, integer-ms game time, Vitest in `node`, iOS share fallback, `.gitattributes`); a cut order; and a verification map from every GDD §11 acceptance check and every brief must-have to the step that closes it. No code written.
+- **Decisions:**
+  - [directed] SQL engine: DuckDB via `uv run --with duckdb` and a small `balancing/run_sql.py` runner. Rejected: DuckDB CLI binary (separate install); `@duckdb/node-api` (native binding, flaky on Windows).
+  - [proposed → accepted] UI rendering: Phaser draws only the shop scene; HUD, buttons, reason text, pause menu and summary are an HTML overlay in a CSS flex column (HUD / canvas / controls), so the layers never overlap. Rejected: Phaser-only (tabular numerals, 48 CSS px targets and dialogs are all DOM-shaped); Phaser `DOMElement` (inherits canvas scale).
+  - [directed] Sprites: Claude Code downloads the Kenney Roguelike/RPG and UI packs into their own directory, verifies the licence files and shortlists 8–10 into `public/assets/candidates/`; I confirm or swap (step S5a).
+  - [Claude's call] `baseline-v1.json` gets its own commit in S2, before any Phaser work, so the provenance is one hash.
+  - [Claude's call] Economy game time in integer ms anchored on `nextCustomerAt`; per-frame delta capped at 250 ms in addition to the hidden-tab pause.
+  - [Claude's call] `revised-v1` becomes the public default only once marked accepted in `balancing/notes.md`.
+- **What broke or was wrong:** Session 2's "Where things stand" line said `94bf7af` wasn't pushed; it was pushed right after. Claude Code corrected that line in place to name `6412881` as pushed.
+- **Hand edits:** None.
+- **Testing / playtest notes:** None. No code exists; tests not run.
+- **Learned:** Asking for the trade-off table before choosing turned a vague "two render trees" con into a concrete layout fix (flex column, no overlap), which is what made the overlay the clear pick.
+- **Where things stand / next step:** Branch `main`; this entry and `docs/PLAN-dungeon-counter-v1.md` are committed and pushed together with this wrap-up. Tests: none exist yet. GDD v3 and plan v1 are both approved. Next session: start the plan at **S1** (scaffold until `npm test` is green, add `.gitattributes`, update CLAUDE.md with the stack and commands), then S2 (freeze `baseline-v1` in its own commit).
+- **Showcase line:** Before any code, I had Claude Code turn the final GDD into a step-by-step plan where every requirement maps to a verifiable step, decided the three open technical choices myself (DuckDB via uv, an HTML overlay on a Phaser scene, AI-fetched but human-picked CC0 sprites), and kept the playtests and deploy as my own hands-on steps.
