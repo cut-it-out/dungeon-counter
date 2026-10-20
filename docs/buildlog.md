@@ -92,3 +92,7 @@ Running record of how this project was built with Claude Code. "I" is the develo
 - **Learned:** Asking for the trade-off table before choosing turned a vague "two render trees" con into a concrete layout fix (flex column, no overlap), which is what made the overlay the clear pick.
 - **Where things stand / next step:** Branch `main`; this entry and `docs/PLAN-dungeon-counter-v1.md` are committed and pushed together with this wrap-up. Tests: none exist yet. GDD v3 and plan v1 are both approved. Next session: start the plan at **S1** (scaffold until `npm test` is green, add `.gitattributes`, update CLAUDE.md with the stack and commands), then S2 (freeze `baseline-v1` in its own commit).
 - **Showcase line:** Before any code, I had Claude Code turn the final GDD into a step-by-step plan where every requirement maps to a verifiable step, decided the three open technical choices myself (DuckDB via uv, an HTML overlay on a Phaser scene, AI-fetched but human-picked CC0 sprites), and kept the playtests and deploy as my own hands-on steps.
+
+### Session 4 — Tuesday 20 October 2026 — (in progress)
+
+- [direction] "lets execute the plan. do the steps one-by-one after each other. once it is confirmed move to the next one. take notes of any deviation/questions on the way and let me know once you are done. stop only after you delivered day 1 (after S5a)." — start of plan execution, S1 → S5a.
