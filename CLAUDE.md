@@ -19,7 +19,7 @@ Nothing outside the repo persists between sessions, so `docs/buildlog.md` is the
 
 ## Stack and commands
 
-Phaser 3 + Vite + TypeScript, Vitest for tests (`environment: 'node'`; economy tests never import Phaser). Spec: `docs/GDD-dungeon-counter-v3.md`; execution plan: `docs/PLAN-dungeon-counter-v1.md`.
+Phaser 3 + Vite + TypeScript, Vitest for tests (`environment: 'node'`; economy tests never import Phaser). Spec: `docs/GDD-dungeon-counter-v4.md` (v1–v3 kept for provenance); execution plan: `docs/PLAN-dungeon-counter-v1.md`.
 
 - `npm test`: run all tests once (`vitest run`).
 - `npm run dev`: Vite dev server on port 6123 (`npm run dev -- --host` to reach it from a phone).

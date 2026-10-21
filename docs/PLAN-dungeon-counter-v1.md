@@ -1,6 +1,6 @@
 # Dungeon Counter — Execution Plan (v1)
 
-*Approved · 20 October 2026 · Built from `docs/GDD-dungeon-counter-v3.md`*
+*Approved · 20 October 2026 · Built from `docs/GDD-dungeon-counter-v3.md` · Amended 21 October 2026 for the challenge pivot (`docs/GDD-dungeon-counter-v4.md`, steps P1–P5 below)*
 
 Each step names its priority (P0/P1/P2 from GDD §0), the files it touches, and the command whose output confirms it. Steps marked **[you]** are the developer's: Claude Code can't do them. Execution starts at S1.
 
@@ -117,7 +117,17 @@ Download the Kenney Roguelike/RPG Pack and UI Pack (CC0) into a fresh directory 
 ✔ `?config=baseline` and `?config=revised` (once it exists) load different saves and print their id.
 
 **S10. Phone smoke test.** P1 **[you]**
-On your phone over `npm run dev --host` (or after S11): buttons ≥ 48 CSS px, text legible, a full session completes, refresh resumes, CSV export produces a file you can open or share. Note anything off in `balancing/notes.md`; I fix it.
+On your phone over `npm run dev --host` (or after S11): buttons ≥ 48 CSS px, text legible, a full session completes, refresh resumes, CSV export produces a file you can open or share. Note anything off in `balancing/notes.md`; I fix it. *(Session 7: runs on the challenge build; three action buttons, the rush badge and the Crates Lv 3 Restock behaviour join the checklist.)*
+
+### Day 2b — challenge pivot (Sessions 6–7, inserted after my playtest review)
+
+The idle loop was judged solved after a few rounds (build log Session 6), so the game was changed before any evidence was gathered on it. Its two complete played runs stay as the before-evidence; the build is tag `idle-loop-v1`.
+
+**P1. Challenge economy.** ✔ `1cfbf5d`. `challenge-v1.json` (frozen), `arrivalTimes` with rush windows, restock cooldown, Bigger Crates, dead-shop guard for both upgrades, `summarize` with profit and per-rush service; `baseline-v1.json` moved to `balancing/configs/`; save schema 2; `crate_level` CSV column.
+**P2. Headless strategies.** ✔ `8b4feae`. `none` / `brews-only` / `crates-first` / `cheaper-first` with a shared 60 s upgrade horizon; idle time split at the cooldown end.
+**P3. Personal best.** ✔ `e35e021`. Own storage key per config; idempotent *New best!*.
+**P4. Challenge UI.** ✔ `7565500`. Three action buttons, both upgrade lines, rush badge, profit headline and best on summary and title.
+**P5. GDD v4 + this amendment.** ✔ Session 7.
 
 ### Day 3 — tuning & portfolio (~8 h)
 
@@ -128,20 +138,22 @@ I add nothing special; Vite's `dist/` is static. In the Cloudflare dashboard: Wo
 **S12. Baseline evidence runs.** P1 **[you]**
 ≥ 1, target 2, complete played sessions on `?config=baseline`, following the §6 policy (restock at stock 1 if affordable; upgrade as soon as allowed; otherwise wait). Export each CSV into `balancing/runs/`. Note deviations in `balancing/notes.md`.
 ✔ Files in `balancing/runs/` whose `run_id`s differ and whose last row is `session_end`.
+*(Session 7: `?config=baseline` now plays `challenge-v1`, and the runs are free play (GDD v4 §6). The two idle-loop runs already in `balancing/runs/` stay as the before-evidence.)*
 
 **S13. SQL aggregation.** P1 (decision A)
 `balancing/summary.sql`: one query over `read_csv_auto('balancing/runs/*.csv')`, grouped by `run_id, config_id, run_type`: first-upgrade time, idle time (`LEAD(elapsed_s)` × availability `CASE` from row state and config constants), longest idle stretch, action spacing, upgrade spacing, revenue in minute 2 vs 5, time-weighted surplus, missed sales, revenue, restock spend, upgrade spend, closing balance, reconciliation check. `balancing/run_sql.py` + `README` line: `uv run --with duckdb balancing/run_sql.py`.
 ✔ The command prints one row per run; `closing == start + Σ amount` is `true` for every run.
+*(Session 7: add profit, rush service per window, last-upgrade time and the Crates level; split idle intervals at `ready_at` = latest restock + `restockCooldown` (GDD v4 §6). Constants come from `src/config/challenge-*.json` or, for idle runs, `balancing/configs/baseline-v1.json`; old CSVs lack `crate_level`, so read with `union_by_name`.)*
 
-**S14. `revised-v1`.** P1
-From the S13 numbers, one headline change (or one tightly justified set). `src/config/revised-v1.json`, hypothesis + old/new values in `balancing/notes.md`. The policy test (S4) runs it automatically for a sanity check, labelled as such.
+**S14. `challenge-v2`** *(was `revised-v1`)*. P1
+From the S13 numbers, one headline change (or one tightly justified set). `src/config/challenge-v2.json`, hypothesis + old/new values in `balancing/notes.md`. The strategy runs (P2) run it automatically for a sanity check, labelled as such.
 ✔ `npm test` green on both configs; commit.
 
 **S15. Revised evidence runs.** P1 **[you]**
 Same as S12 on `?config=revised`. Then I re-run S13.
 
 **S16. Balancing table + interpretation.** P1
-`balancing/balancing-table.md`: parameters side by side, first-upgrade time, idle time, revenue, closing balance, missed sales per run, and a written reading that says what the data supports, including "baseline wasn't flawed" or "revised wasn't better" if that's what it shows. Chart only if time remains.
+`balancing/balancing-table.md`: parameters side by side, first-upgrade time, idle time, revenue, closing balance, missed sales per run *(Session 7: plus profit, rush service, upgrade mix, the strategy results, and the idle loop vs challenge loop comparison, GDD v4 §10)*, and a written reading that says what the data supports, including "baseline wasn't flawed" or "revised wasn't better" if that's what it shows. Chart only if time remains.
 ✔ Every number in the table traces to a `run_id` in `balancing/runs/`.
 
 **S17. Credits, disclosure, docs.** P1
