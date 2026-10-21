@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import type { EconomyConfig } from '../config/types';
+import { exportCsv } from '../csv/export';
 import { advanceTo, canRestock, canUpgrade, createState, restock, summarize, upgrade } from '../economy/economy';
 import type { EconomyState } from '../economy/types';
 import { markerEvent, newRun, type LogEvent, type RunLog } from '../log/eventLog';
@@ -108,6 +109,7 @@ export class PlayScene extends Phaser.Scene {
         this.paused = false;
         overlay.hidePause();
       },
+      onExport: () => void exportCsv(this.run),
       onReset: () => {
         clearSave(browserStorage(), this.cfg.id);
         this.scene.start('Title');

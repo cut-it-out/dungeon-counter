@@ -126,12 +126,16 @@ export function renderPlay(
   );
 }
 
-export function showPause(configId: string, handlers: { onResume: () => void; onReset: () => void }) {
+export function showPause(
+  configId: string,
+  handlers: { onResume: () => void; onExport: () => void; onReset: () => void },
+) {
   showOnly('pause-panel');
   setText(el('pause-config'), `Config: ${configId}`);
   el('pause-menu').hidden = false;
   el('reset-confirm').hidden = true;
   el('resume-btn').onclick = handlers.onResume;
+  el('pause-export-btn').onclick = handlers.onExport;
   el('reset-btn').onclick = () => {
     el('pause-menu').hidden = true;
     el('reset-confirm').hidden = false;
@@ -144,7 +148,7 @@ export function hidePause() {
   showOnly(null);
 }
 
-export function showSummary(summary: SessionSummary, handlers: { onNewDay: () => void }) {
+export function showSummary(summary: SessionSummary, handlers: { onExport: () => void; onNewDay: () => void }) {
   showOnly('summary-panel');
   el('pause-btn').hidden = true;
   setText(el('sum-revenue'), `${summary.revenue}c`);
@@ -154,5 +158,6 @@ export function showSummary(summary: SessionSummary, handlers: { onNewDay: () =>
   setText(el('sum-missed'), `${summary.missed}`);
   setText(el('sum-level'), `${summary.upgradeLevel}`);
   setText(el('sum-closing'), `${summary.closing}c`);
+  el('summary-export-btn').onclick = handlers.onExport;
   el('summary-new-day-btn').onclick = handlers.onNewDay;
 }

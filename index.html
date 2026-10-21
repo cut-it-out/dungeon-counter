@@ -79,6 +79,7 @@
           <p id="pause-config" class="muted"></p>
           <div id="pause-menu" class="stack">
             <button id="resume-btn" class="panel-btn primary" type="button">Resume</button>
+            <button id="pause-export-btn" class="panel-btn" type="button">Export CSV</button>
             <button id="reset-btn" class="panel-btn" type="button">Reset run</button>
           </div>
           <div id="reset-confirm" class="stack" hidden>
@@ -103,7 +104,10 @@
               <tr class="total"><th>Closing balance</th><td id="sum-closing"></td></tr>
             </tbody>
           </table>
-          <button id="summary-new-day-btn" class="panel-btn primary" type="button">New day</button>
+          <div class="stack">
+            <button id="summary-export-btn" class="panel-btn" type="button">Export CSV</button>
+            <button id="summary-new-day-btn" class="panel-btn primary" type="button">New day</button>
+          </div>
         </div>
       </section>
     </div>

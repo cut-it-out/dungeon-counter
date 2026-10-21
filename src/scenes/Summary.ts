@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import type { EconomyConfig } from '../config/types';
+import { exportCsv } from '../csv/export';
 import { summarize } from '../economy/economy';
 import type { RunLog } from '../log/eventLog';
 import * as overlay from '../ui/overlay';
@@ -15,6 +16,7 @@ export class SummaryScene extends Phaser.Scene {
     const cfg = this.registry.get('config') as EconomyConfig;
     const show = () =>
       overlay.showSummary(summarize(cfg, data.run.events), {
+        onExport: () => void exportCsv(data.run),
         // The finished log stays saved until replaced (GDD §8), so New day confirms.
         onNewDay: () =>
           overlay.confirm(
