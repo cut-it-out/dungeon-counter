@@ -1,19 +1,24 @@
 import type { EconomyConfig } from '../config/types';
-import { advanceTo, createState, restock, upgrade } from './economy';
-import { decide } from './policy';
+import { advanceTo, createState, restock, upgrade, upgradeCrates } from './economy';
+import { decide, type Strategy } from './policy';
 import type { EconomyEvent, EconomyState } from './types';
 
-// Headless session: the §6 policy reacts immediately after every arrival (and at t = 0),
-// acting until it decides to wait. Not a playtest; a sanity check of the economy.
-export function runSession(cfg: EconomyConfig): { state: EconomyState; events: EconomyEvent[] } {
+// Headless session: the strategy reacts immediately after every arrival, when the restock
+// cooldown ends and at t = 0, acting until it decides to wait. Not a playtest; a sanity check
+// of the economy and the dominance check between strategies.
+export function runSession(
+  cfg: EconomyConfig,
+  strategy: Strategy = 'cheaper-first',
+): { state: EconomyState; events: EconomyEvent[] } {
   const state = createState(cfg);
   const events: EconomyEvent[] = [];
+  const actions = { restock, upgrade, crates_upgrade: upgradeCrates };
 
   const act = () => {
     for (;;) {
-      const action = decide(state, cfg);
+      const action = decide(state, cfg, strategy);
       if (action === 'wait') return;
-      const event = action === 'restock' ? restock(state, cfg) : upgrade(state, cfg);
+      const event = actions[action](state, cfg);
       if (!event) return;
       events.push(event);
     }
@@ -21,7 +26,9 @@ export function runSession(cfg: EconomyConfig): { state: EconomyState; events: E
 
   act();
   while (!state.finished) {
-    events.push(...advanceTo(state, cfg, state.nextCustomerAt));
+    const cooling = state.restockReadyAt > state.elapsedMs;
+    const target = cooling ? Math.min(state.nextCustomerAt, state.restockReadyAt) : state.nextCustomerAt;
+    events.push(...advanceTo(state, cfg, target));
     act();
   }
   return { state, events };
