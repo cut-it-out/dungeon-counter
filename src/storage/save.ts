@@ -4,9 +4,9 @@ import type { LogEvent, RunLog } from '../log/eventLog';
 // Best-effort per-config save (GDD §8). Every storage call is wrapped: a blocked or full
 // storage returns false / null, the game keeps running in memory and shows "Not saved".
 
-export const SCHEMA_VERSION = 1;
+export const SCHEMA_VERSION = 2;
 
-export const saveKey = (configId: string) => `dungeon-counter-save:v1:${configId}`;
+export const saveKey = (configId: string) => `dungeon-counter-save:v2:${configId}`;
 
 export interface SaveData {
   schemaVersion: number;
@@ -15,8 +15,10 @@ export interface SaveData {
   coins: number;
   stock: number;
   upgradeLevel: number;
+  cratesLevel: number;
   elapsedMs: number;
   nextCustomerAt: number;
+  restockReadyAt: number;
   finished: boolean;
   events: LogEvent[];
 }
@@ -40,8 +42,10 @@ export function toSave(state: EconomyState, run: RunLog): SaveData {
     coins: state.coins,
     stock: state.stock,
     upgradeLevel: state.upgradeLevel,
+    cratesLevel: state.cratesLevel,
     elapsedMs: state.elapsedMs,
     nextCustomerAt: state.nextCustomerAt,
+    restockReadyAt: state.restockReadyAt,
     finished: state.finished,
     events: run.events,
   };
@@ -51,8 +55,10 @@ export const stateFromSave = (save: SaveData): EconomyState => ({
   coins: save.coins,
   stock: save.stock,
   upgradeLevel: save.upgradeLevel,
+  cratesLevel: save.cratesLevel,
   elapsedMs: save.elapsedMs,
   nextCustomerAt: save.nextCustomerAt,
+  restockReadyAt: save.restockReadyAt,
   finished: save.finished,
 });
 
@@ -93,7 +99,7 @@ function isSaveData(v: unknown, configId: string): v is SaveData {
     s.schemaVersion === SCHEMA_VERSION &&
     s.configId === configId &&
     typeof s.runId === 'string' &&
-    [s.coins, s.stock, s.upgradeLevel, s.elapsedMs, s.nextCustomerAt].every(isInt) &&
+    [s.coins, s.stock, s.upgradeLevel, s.cratesLevel, s.elapsedMs, s.nextCustomerAt, s.restockReadyAt].every(isInt) &&
     typeof s.finished === 'boolean' &&
     Array.isArray(s.events)
   );

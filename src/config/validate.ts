@@ -15,6 +15,9 @@ export function validateConfig(cfg: EconomyConfig): EconomyConfig {
     'salePrice',
     'upgradeBaseCost',
     'upgradePriceStep',
+    'cratesBaseCost',
+    'cratesBatchStep',
+    'cratesMaxLevel',
   ] as const;
   for (const key of positiveIntegers) {
     if (!isPosInt(cfg[key])) errors.push(`${key} must be a positive integer (got ${cfg[key]})`);
@@ -22,11 +25,30 @@ export function validateConfig(cfg: EconomyConfig): EconomyConfig {
 
   if (!(cfg.sessionSeconds > 0)) errors.push(`sessionSeconds must be positive (got ${cfg.sessionSeconds})`);
   if (!(cfg.customerInterval > 0)) errors.push(`customerInterval must be positive (got ${cfg.customerInterval})`);
-  if (!(cfg.upgradeCostGrowth > 0) || !Number.isFinite(cfg.upgradeCostGrowth)) {
-    errors.push(`upgradeCostGrowth must be a positive number (got ${cfg.upgradeCostGrowth})`);
+  if (!(cfg.restockCooldown >= 0) || !Number.isFinite(cfg.restockCooldown)) {
+    errors.push(`restockCooldown must be a number >= 0 (got ${cfg.restockCooldown})`);
+  }
+  for (const key of ['upgradeCostGrowth', 'cratesCostGrowth'] as const) {
+    if (!(cfg[key] > 0) || !Number.isFinite(cfg[key])) errors.push(`${key} must be a positive number (got ${cfg[key]})`);
   }
   if (cfg.restockBatch > cfg.shelfCap) {
     errors.push(`restockBatch (${cfg.restockBatch}) must be <= shelfCap (${cfg.shelfCap})`);
+  }
+  const maxBatch = cfg.restockBatch + cfg.cratesBatchStep * cfg.cratesMaxLevel;
+  if (maxBatch > cfg.shelfCap) {
+    errors.push(`restockBatch + cratesBatchStep * cratesMaxLevel (${maxBatch}) must be <= shelfCap (${cfg.shelfCap})`);
+  }
+  if (!Array.isArray(cfg.rushes)) {
+    errors.push('rushes must be an array');
+  } else {
+    let previousEnd = 0;
+    cfg.rushes.forEach((r, i) => {
+      if (!(r.intervalS > 0)) errors.push(`rushes[${i}].intervalS must be positive (got ${r.intervalS})`);
+      if (!(r.startS >= previousEnd && r.startS < r.endS && r.endS <= cfg.sessionSeconds)) {
+        errors.push(`rushes[${i}] must be sorted, non-overlapping and inside the session (got ${r.startS}-${r.endS}s)`);
+      }
+      previousEnd = r.endS;
+    });
   }
   if (!Number.isInteger(cfg.startStock) || cfg.startStock < 0 || cfg.startStock > cfg.shelfCap) {
     errors.push(`startStock must be an integer in [0, shelfCap] (got ${cfg.startStock})`);

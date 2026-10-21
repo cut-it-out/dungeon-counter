@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import type { EconomyConfig } from '../src/config/types';
 import { validateConfig } from '../src/config/validate';
-import { canRestock, canUpgrade, createState, priceAt, sessionMs, summarize } from '../src/economy/economy';
+import { arrivalTimes, canRestock, canUpgrade, createState, priceAt, sessionMs, summarize } from '../src/economy/economy';
 import { runSession } from '../src/economy/runSession';
 import type { EconomyEvent, EconomyState } from '../src/economy/types';
 
-// Every config file in src/config/, so revised-v1 is checked as soon as it exists.
+// Every config file in src/config/, so challenge-v2 is checked as soon as it exists.
 const modules = import.meta.glob<{ default: EconomyConfig }>('../src/config/*.json', { eager: true });
 const configs = Object.values(modules).map((m) => m.default);
 
@@ -13,8 +13,10 @@ const stateAt = (e: EconomyEvent): EconomyState => ({
   coins: e.coins,
   stock: e.stock,
   upgradeLevel: e.upgradeLevel,
+  cratesLevel: e.cratesLevel,
   elapsedMs: e.elapsedMs,
   nextCustomerAt: 0,
+  restockReadyAt: 0,
   finished: false,
 });
 
@@ -31,8 +33,8 @@ function idleMs(cfg: EconomyConfig, events: EconomyEvent[]): number {
 }
 
 describe('full-session policy run', () => {
-  it('finds at least the baseline config', () => {
-    expect(configs.map((c) => c.id)).toContain('baseline-v1');
+  it('finds at least challenge-v1', () => {
+    expect(configs.map((c) => c.id)).toContain('challenge-v1');
   });
 
   describe.each(configs.map((c) => [c.id, c] as const))('%s', (_id, cfg) => {
@@ -46,7 +48,7 @@ describe('full-session policy run', () => {
     });
 
     it('serves every scheduled arrival exactly once', () => {
-      const expected = Math.floor(cfg.sessionSeconds / cfg.customerInterval);
+      const expected = arrivalTimes(cfg).length;
       expect(summary.sold + summary.missed).toBe(expected);
     });
 

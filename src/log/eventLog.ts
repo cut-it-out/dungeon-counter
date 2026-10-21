@@ -19,7 +19,7 @@ export interface RunLog {
   events: LogEvent[];
 }
 
-// Exact CSV header order (GDD §9).
+// Exact CSV header order (GDD §9; crate_level appended in Session 6 so idle-loop CSVs keep their columns).
 export const CSV_COLUMNS = [
   'run_id',
   'run_type',
@@ -31,6 +31,7 @@ export const CSV_COLUMNS = [
   'stock',
   'upgrade_level',
   'price',
+  'crate_level',
 ] as const;
 
 export const newRunId = (random: () => number = Math.random) =>
@@ -51,6 +52,7 @@ export function markerEvent(state: EconomyState, cfg: EconomyConfig, event: 'ses
     stock: state.stock,
     upgradeLevel: state.upgradeLevel,
     price: priceAt(cfg, state.upgradeLevel),
+    cratesLevel: state.cratesLevel,
   };
 }
 
@@ -66,4 +68,5 @@ export const toRow = (run: RunLog, e: LogEvent): (string | number)[] => [
   e.stock,
   e.upgradeLevel,
   e.price,
+  e.cratesLevel,
 ];

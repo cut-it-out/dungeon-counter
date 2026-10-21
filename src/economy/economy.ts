@@ -4,21 +4,71 @@ import type { Availability, EconomyEvent, EconomyEventType, EconomyState } from 
 // Pure game rules (GDD §4/§5). No Phaser imports. Functions mutate the given state
 // and return the events they produced; all game time is integer milliseconds.
 
-export const sessionMs = (cfg: EconomyConfig) => Math.round(cfg.sessionSeconds * 1000);
-export const intervalMs = (cfg: EconomyConfig) => Math.round(cfg.customerInterval * 1000);
+const toMs = (seconds: number) => Math.round(seconds * 1000);
+export const sessionMs = (cfg: EconomyConfig) => toMs(cfg.sessionSeconds);
+export const cooldownMs = (cfg: EconomyConfig) => toMs(cfg.restockCooldown);
+
+// nextCustomerAt once every arrival has been processed; integer, so it survives the save check.
+export const NO_ARRIVAL = Number.MAX_SAFE_INTEGER;
 
 export const priceAt = (cfg: EconomyConfig, level: number) => cfg.salePrice + cfg.upgradePriceStep * level;
 
 export const upgradeCostAt = (cfg: EconomyConfig, level: number) =>
   Math.round(cfg.upgradeBaseCost * cfg.upgradeCostGrowth ** level);
 
+export const batchAt = (cfg: EconomyConfig, cratesLevel: number) => cfg.restockBatch + cfg.cratesBatchStep * cratesLevel;
+
+export const cratesCostAt = (cfg: EconomyConfig, level: number) =>
+  Math.round(cfg.cratesBaseCost * cfg.cratesCostGrowth ** level);
+
+// Arrival schedule (Session 6): the session is cut into calm stretches and rush windows; each
+// stretch places arrivals at its start + k × its interval, up to and including its end. Built in
+// integer ms so no float drift accumulates, and cached because the scene asks every frame.
+const arrivalCache = new WeakMap<EconomyConfig, number[]>();
+
+export function arrivalTimes(cfg: EconomyConfig): number[] {
+  const cached = arrivalCache.get(cfg);
+  if (cached) return cached;
+  const times: number[] = [];
+  const add = (fromMs: number, toMsIncl: number, stepMs: number) => {
+    for (let t = fromMs + stepMs; t <= toMsIncl; t += stepMs) times.push(t);
+  };
+  const calm = toMs(cfg.customerInterval);
+  let stretchStart = 0;
+  for (const rush of cfg.rushes) {
+    add(stretchStart, toMs(rush.startS), calm);
+    add(toMs(rush.startS), toMs(rush.endS), toMs(rush.intervalS));
+    stretchStart = toMs(rush.endS);
+  }
+  add(stretchStart, sessionMs(cfg), calm);
+  arrivalCache.set(cfg, times);
+  return times;
+}
+
+export const nextArrivalAfter = (cfg: EconomyConfig, tMs: number) =>
+  arrivalTimes(cfg).find((t) => t > tMs) ?? NO_ARRIVAL;
+
+// Index of the rush window that tMs falls in (start exclusive, end inclusive, like its arrivals), or -1.
+export const rushIndexAt = (cfg: EconomyConfig, tMs: number) =>
+  cfg.rushes.findIndex((r) => tMs > toMs(r.startS) && tMs <= toMs(r.endS));
+
+// HUD countdown: the rush in progress and the ms until it ends, or the next rush and the ms until it starts.
+export function rushStatus(cfg: EconomyConfig, tMs: number): { active: boolean; msLeft: number } | null {
+  const now = rushIndexAt(cfg, tMs);
+  if (now >= 0) return { active: true, msLeft: toMs(cfg.rushes[now].endS) - tMs };
+  const next = cfg.rushes.find((r) => toMs(r.startS) >= tMs);
+  return next ? { active: false, msLeft: toMs(next.startS) - tMs } : null;
+}
+
 export function createState(cfg: EconomyConfig): EconomyState {
   return {
     coins: cfg.startCoins,
     stock: cfg.startStock,
     upgradeLevel: 0,
+    cratesLevel: 0,
     elapsedMs: 0,
-    nextCustomerAt: intervalMs(cfg),
+    nextCustomerAt: nextArrivalAfter(cfg, 0),
+    restockReadyAt: 0,
     finished: false,
   };
 }
@@ -32,6 +82,7 @@ function makeEvent(state: EconomyState, cfg: EconomyConfig, event: EconomyEventT
     stock: state.stock,
     upgradeLevel: state.upgradeLevel,
     price: priceAt(cfg, state.upgradeLevel),
+    cratesLevel: state.cratesLevel,
   };
 }
 
@@ -45,7 +96,7 @@ export function advanceTo(state: EconomyState, cfg: EconomyConfig, tMs: number):
 
   while (state.nextCustomerAt <= target) {
     state.elapsedMs = state.nextCustomerAt;
-    state.nextCustomerAt += intervalMs(cfg);
+    state.nextCustomerAt = nextArrivalAfter(cfg, state.nextCustomerAt);
     if (state.stock > 0) {
       const price = priceAt(cfg, state.upgradeLevel);
       state.stock -= 1;
@@ -64,42 +115,69 @@ export function advanceTo(state: EconomyState, cfg: EconomyConfig, tMs: number):
   return events;
 }
 
-// When both rules block, need_slots is reported: coins alone would not make a restock possible.
+// need_slots is reported first: neither coins nor waiting would make a restock possible.
+// need_coins comes before cooldown, because waiting out the cooldown would not be enough.
 export function canRestock(state: EconomyState, cfg: EconomyConfig): Availability {
-  if (state.stock > cfg.shelfCap - cfg.restockBatch) return { ok: false, reason: 'need_slots' };
+  if (state.stock > cfg.shelfCap - batchAt(cfg, state.cratesLevel)) return { ok: false, reason: 'need_slots' };
   if (state.coins < cfg.restockCost) return { ok: false, reason: 'need_coins' };
+  if (state.elapsedMs < state.restockReadyAt) return { ok: false, reason: 'cooldown' };
   return { ok: true };
 }
 
 // Coins at which an upgrade stops creating a dead shop: after paying for it, the coins left plus
-// selling out the shelf at the new price must still cover one restock.
+// selling out the shelf at the price after the upgrade must still cover one restock.
+const safeAt = (cost: number, state: EconomyState, cfg: EconomyConfig, priceAfter: number) =>
+  cost + cfg.restockCost - state.stock * priceAfter;
+
 export const upgradeSafeAt = (state: EconomyState, cfg: EconomyConfig) =>
-  upgradeCostAt(cfg, state.upgradeLevel) + cfg.restockCost - state.stock * priceAt(cfg, state.upgradeLevel + 1);
+  safeAt(upgradeCostAt(cfg, state.upgradeLevel), state, cfg, priceAt(cfg, state.upgradeLevel + 1));
+
+// Bigger Crates leaves the price unchanged.
+export const cratesSafeAt = (state: EconomyState, cfg: EconomyConfig) =>
+  safeAt(cratesCostAt(cfg, state.cratesLevel), state, cfg, priceAt(cfg, state.upgradeLevel));
 
 // Dead-shop guard (GDD §4, option B, Session 4): block an upgrade only if even selling the whole
 // shelf afterwards could not pay for a restock. At stock 0 this is coins - cost < restockCost.
 export function canUpgrade(state: EconomyState, cfg: EconomyConfig): Availability {
-  const cost = upgradeCostAt(cfg, state.upgradeLevel);
-  if (state.coins < cost) return { ok: false, reason: 'need_coins' };
+  if (state.coins < upgradeCostAt(cfg, state.upgradeLevel)) return { ok: false, reason: 'need_coins' };
   if (state.coins < upgradeSafeAt(state, cfg)) return { ok: false, reason: 'dead_shop_guard' };
+  return { ok: true };
+}
+
+// Same guard for Bigger Crates, which also stops at cratesMaxLevel.
+export function canUpgradeCrates(state: EconomyState, cfg: EconomyConfig): Availability {
+  if (state.cratesLevel >= cfg.cratesMaxLevel) return { ok: false, reason: 'max_level' };
+  if (state.coins < cratesCostAt(cfg, state.cratesLevel)) return { ok: false, reason: 'need_coins' };
+  if (state.coins < cratesSafeAt(state, cfg)) return { ok: false, reason: 'dead_shop_guard' };
   return { ok: true };
 }
 
 export function restock(state: EconomyState, cfg: EconomyConfig): EconomyEvent | null {
   if (state.finished || !canRestock(state, cfg).ok) return null;
   state.coins -= cfg.restockCost;
-  state.stock += cfg.restockBatch;
+  state.stock += batchAt(cfg, state.cratesLevel);
+  state.restockReadyAt = state.elapsedMs + cooldownMs(cfg);
   return makeEvent(state, cfg, 'restock', -cfg.restockCost);
+}
+
+export interface RushResult {
+  served: number;
+  missed: number;
 }
 
 export interface SessionSummary {
   revenue: number; // gross sales revenue
   restockSpend: number;
-  upgradeSpend: number;
+  brewsSpend: number;
+  cratesSpend: number;
+  upgradeSpend: number; // brewsSpend + cratesSpend
   sold: number;
   missed: number;
-  upgradeLevel: number;
+  upgradeLevel: number; // Better Brews level
+  cratesLevel: number;
   closing: number; // closing coin balance
+  profit: number; // closing - startCoins, the personal-best score (Session 6)
+  rushes: RushResult[]; // one per config rush window, in order
 }
 
 // Summary screen numbers (GDD §3/§5), derived from the event log alone. Accepts log rows
@@ -110,14 +188,29 @@ export function summarize(
 ): SessionSummary {
   const sum = (type: string) => events.filter((e) => e.event === type).reduce((s, e) => s + e.amount, 0);
   const last = events[events.length - 1];
+  const closing = last ? last.coins : cfg.startCoins;
+  const brewsSpend = -sum('upgrade');
+  const cratesSpend = -sum('crates_upgrade');
+  const rushes = cfg.rushes.map(() => ({ served: 0, missed: 0 }));
+  for (const e of events) {
+    if (e.event !== 'sale' && e.event !== 'missed_sale') continue;
+    const rush = rushes[rushIndexAt(cfg, e.elapsedMs)];
+    if (rush && e.event === 'sale') rush.served += 1;
+    if (rush && e.event === 'missed_sale') rush.missed += 1;
+  }
   return {
     revenue: sum('sale'),
     restockSpend: -sum('restock'),
-    upgradeSpend: -sum('upgrade'),
+    brewsSpend,
+    cratesSpend,
+    upgradeSpend: brewsSpend + cratesSpend,
     sold: events.filter((e) => e.event === 'sale').length,
     missed: events.filter((e) => e.event === 'missed_sale').length,
     upgradeLevel: last ? last.upgradeLevel : 0,
-    closing: last ? last.coins : cfg.startCoins,
+    cratesLevel: last ? last.cratesLevel : 0,
+    closing,
+    profit: closing - cfg.startCoins,
+    rushes,
   };
 }
 
@@ -127,4 +220,12 @@ export function upgrade(state: EconomyState, cfg: EconomyConfig): EconomyEvent |
   state.coins -= cost;
   state.upgradeLevel += 1;
   return makeEvent(state, cfg, 'upgrade', -cost);
+}
+
+export function upgradeCrates(state: EconomyState, cfg: EconomyConfig): EconomyEvent | null {
+  if (state.finished || !canUpgradeCrates(state, cfg).ok) return null;
+  const cost = cratesCostAt(cfg, state.cratesLevel);
+  state.coins -= cost;
+  state.cratesLevel += 1;
+  return makeEvent(state, cfg, 'crates_upgrade', -cost);
 }

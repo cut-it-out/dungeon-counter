@@ -1,5 +1,5 @@
 import type { EconomyConfig } from '../config/types';
-import { priceAt, sessionMs, upgradeCostAt, upgradeSafeAt, type SessionSummary } from '../economy/economy';
+import { batchAt, priceAt, sessionMs, upgradeCostAt, upgradeSafeAt, type SessionSummary } from '../economy/economy';
 import type { Availability, BlockReason, EconomyState } from '../economy/types';
 
 // DOM overlay (plan decision B): HUD, action buttons, reason text, pause menu, title and summary.
@@ -21,15 +21,20 @@ const formatClock = (ms: number) => {
   return `${Math.floor(total / 60)}:${String(total % 60).padStart(2, '0')}`;
 };
 
-// `coins` is the action's cost for need_coins and the guard's unlock amount for dead_shop_guard.
-export function reasonText(reason: BlockReason, cfg: EconomyConfig, coins: number): string {
+// `value` is the action's cost for need_coins, the guard's unlock amount for dead_shop_guard,
+// the current crate size for need_slots and whole seconds left for cooldown.
+export function reasonText(reason: BlockReason, value: number): string {
   switch (reason) {
     case 'need_coins':
-      return `Need ${coins}c`;
+      return `Need ${value}c`;
     case 'need_slots':
-      return `Need ${cfg.restockBatch} free slots`;
+      return `Need ${value} free slots`;
+    case 'cooldown':
+      return `Ready in ${value}s`;
     case 'dead_shop_guard':
-      return `Need ${coins}c to stay stocked`;
+      return `Need ${value}c to stay stocked`;
+    case 'max_level':
+      return 'Max level';
   }
 }
 
@@ -107,14 +112,20 @@ export function renderPlay(
     el('upgrade-info'),
     `Price ${priceAt(cfg, state.upgradeLevel)}c → ${priceAt(cfg, state.upgradeLevel + 1)}c · cost ${cost}c`,
   );
-  setText(el('restock-label'), `Restock +${cfg.restockBatch}`);
+  const batch = batchAt(cfg, state.cratesLevel);
+  setText(el('restock-label'), `Restock +${batch}`);
   setText(el('restock-cost'), `${cfg.restockCost}c`);
   setText(el('upgrade-cost'), `${cost}c`);
+  const restockValue: Record<string, number> = {
+    need_coins: cfg.restockCost,
+    need_slots: batch,
+    cooldown: Math.ceil((state.restockReadyAt - state.elapsedMs) / 1000),
+  };
   setAction(
     el<HTMLButtonElement>('restock-btn'),
     el('restock-reason'),
     restock,
-    restock.ok ? '' : reasonText(restock.reason, cfg, cfg.restockCost),
+    restock.ok ? '' : reasonText(restock.reason, restockValue[restock.reason] ?? 0),
   );
   setAction(
     el<HTMLButtonElement>('upgrade-btn'),
@@ -122,7 +133,7 @@ export function renderPlay(
     upgrade,
     upgrade.ok
       ? ''
-      : reasonText(upgrade.reason, cfg, upgrade.reason === 'dead_shop_guard' ? upgradeSafeAt(state, cfg) : cost),
+      : reasonText(upgrade.reason, upgrade.reason === 'dead_shop_guard' ? upgradeSafeAt(state, cfg) : cost),
   );
 }
 

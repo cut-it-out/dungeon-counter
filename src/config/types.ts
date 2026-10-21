@@ -1,4 +1,12 @@
 // Economy config (GDD §5). Times are in seconds here; the economy converts to integer ms.
+
+// A rush window: between startS (exclusive) and endS (inclusive) customers arrive every intervalS.
+export interface Rush {
+  startS: number;
+  endS: number;
+  intervalS: number;
+}
+
 export interface EconomyConfig {
   id: string;
   sessionSeconds: number;
@@ -6,12 +14,18 @@ export interface EconomyConfig {
   startStock: number;
   shelfCap: number;
   restockCost: number;
-  restockBatch: number;
+  restockBatch: number; // crate size at Bigger Crates level 0
+  restockCooldown: number; // seconds after a restock before the next one
   salePrice: number;
-  customerInterval: number;
+  customerInterval: number; // calm interval, outside the rushes
+  rushes: Rush[];
+  // Better Brews: +upgradePriceStep sale price per level.
   upgradeBaseCost: number;
   upgradeCostGrowth: number;
   upgradePriceStep: number;
-  // Provisional presentation values only (GDD §5); not validated success criteria.
-  rankThresholds: { bronze: number; silver: number; gold: number };
+  // Bigger Crates: +cratesBatchStep potions per crate per level, same crate cost.
+  cratesBaseCost: number;
+  cratesCostGrowth: number;
+  cratesBatchStep: number;
+  cratesMaxLevel: number;
 }

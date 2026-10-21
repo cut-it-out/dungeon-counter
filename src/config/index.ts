@@ -6,12 +6,12 @@ import { validateConfig } from './validate';
 const modules = import.meta.glob<{ default: EconomyConfig }>('./*.json', { eager: true });
 export const CONFIGS: EconomyConfig[] = Object.values(modules).map((m) => validateConfig(m.default));
 
-// The public default switches to revised-v1 only once balancing/notes.md marks it accepted
+// The public default switches to challenge-v2 only once balancing/notes.md marks it accepted
 // after played runs. Flip this together with that note.
 export const REVISED_ACCEPTED = false;
 
 // ?config= values; the full id is what saves and CSV rows carry.
-const URL_NAMES: Record<string, string> = { baseline: 'baseline-v1', revised: 'revised-v1' };
+const URL_NAMES: Record<string, string> = { baseline: 'challenge-v1', revised: 'challenge-v2' };
 
 export function selectConfig(
   search: string,
@@ -19,9 +19,9 @@ export function selectConfig(
   revisedAccepted: boolean = REVISED_ACCEPTED,
 ): { config: EconomyConfig; notice: string | null } {
   const byId = (id: string) => configs.find((c) => c.id === id);
-  const baseline = byId('baseline-v1');
-  if (!baseline) throw new Error('baseline-v1.json is missing from src/config/');
-  const fallback = (revisedAccepted && byId('revised-v1')) || baseline;
+  const baseline = byId('challenge-v1');
+  if (!baseline) throw new Error('challenge-v1.json is missing from src/config/');
+  const fallback = (revisedAccepted && byId('challenge-v2')) || baseline;
 
   const requested = new URLSearchParams(search).get('config');
   if (requested === null) return { config: fallback, notice: null };

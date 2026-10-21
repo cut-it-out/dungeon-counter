@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import baseline from '../src/config/baseline-v1.json';
+import challenge from '../src/config/challenge-v1.json';
 import type { EconomyConfig } from '../src/config/types';
 import { advanceTo, createState, restock } from '../src/economy/economy';
 import { markerEvent, newRun } from '../src/log/eventLog';
@@ -14,7 +14,7 @@ import {
   type StorageLike,
 } from '../src/storage/save';
 
-const cfg = baseline as EconomyConfig;
+const cfg = challenge as EconomyConfig;
 
 // In-memory stand-in for localStorage (Vitest runs in node).
 function memoryStorage(): StorageLike & { data: Map<string, string> } {
@@ -39,7 +39,7 @@ const throwing: StorageLike = {
   },
 };
 
-// A run part-way through: start, 43 arrivals to 130 s, one restock.
+// A run part-way through: start, arrivals to 130 s (into the first calm stretch after rush 1), one restock.
 function midRun() {
   const state = createState(cfg);
   const run = newRun(cfg);
@@ -52,7 +52,7 @@ function midRun() {
 
 describe('save / resume', () => {
   it('uses a versioned per-config key', () => {
-    expect(saveKey('baseline-v1')).toBe('dungeon-counter-save:v1:baseline-v1');
+    expect(saveKey('challenge-v1')).toBe('dungeon-counter-save:v2:challenge-v1');
   });
 
   it('round-trips state and events', () => {
@@ -71,7 +71,7 @@ describe('save / resume', () => {
     const storage = memoryStorage();
     const { state, run } = midRun();
     writeSave(storage, toSave(state, run));
-    expect(readSave(storage, 'revised-v1')).toEqual({ save: null, malformed: false });
+    expect(readSave(storage, 'challenge-v2')).toEqual({ save: null, malformed: false });
   });
 
   it('returns no save when nothing is stored', () => {
@@ -107,12 +107,12 @@ describe('save / resume', () => {
     const storage = memoryStorage();
     const state = createState(cfg);
     const run = newRun(cfg);
-    run.events.push(...advanceTo(state, cfg, 6000)); // arrivals at 3 s and 6 s
+    run.events.push(...advanceTo(state, cfg, 8000)); // arrivals at 4 s and 8 s
     writeSave(storage, toSave(state, run));
 
     const resumed = stateFromSave(readSave(storage, cfg.id).save!);
-    expect(advanceTo(resumed, cfg, 6000)).toEqual([]);
-    expect(advanceTo(resumed, cfg, 9000).map((e) => e.elapsedMs)).toEqual([9000]);
+    expect(advanceTo(resumed, cfg, 8000)).toEqual([]);
+    expect(advanceTo(resumed, cfg, 12000).map((e) => e.elapsedMs)).toEqual([12000]);
   });
 
   it('clears the save', () => {

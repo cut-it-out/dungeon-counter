@@ -1,18 +1,16 @@
 import { describe, expect, it } from 'vitest';
-import baseline from '../src/config/baseline-v1.json';
+import baseline from '../balancing/configs/baseline-v1.json';
+import challenge from '../src/config/challenge-v1.json';
 import type { EconomyConfig } from '../src/config/types';
 import { validateConfig } from '../src/config/validate';
 
-const base = baseline as EconomyConfig;
+const base = challenge as EconomyConfig;
 const withChange = (change: Partial<EconomyConfig>): EconomyConfig => ({ ...base, ...change });
 
-describe('baseline-v1', () => {
-  it('validates', () => {
-    expect(() => validateConfig(base)).not.toThrow();
-  });
-
-  it('holds exactly the GDD §5 values', () => {
-    expect(base).toEqual({
+// The idle-loop baseline is retired from play (Session 6) but kept frozen as a reference for its CSVs.
+describe('baseline-v1 reference', () => {
+  it('still holds exactly the GDD v3 §5 values', () => {
+    expect(baseline).toEqual({
       id: 'baseline-v1',
       sessionSeconds: 300,
       startCoins: 20,
@@ -30,7 +28,41 @@ describe('baseline-v1', () => {
   });
 });
 
+describe('challenge-v1', () => {
+  it('validates', () => {
+    expect(() => validateConfig(base)).not.toThrow();
+  });
+
+  it('holds exactly the Session 6 values', () => {
+    expect(base).toEqual({
+      id: 'challenge-v1',
+      sessionSeconds: 300,
+      startCoins: 20,
+      startStock: 5,
+      shelfCap: 20,
+      restockCost: 10,
+      restockBatch: 5,
+      restockCooldown: 5,
+      salePrice: 5,
+      customerInterval: 4,
+      rushes: [
+        { startS: 60, endS: 80, intervalS: 1 },
+        { startS: 150, endS: 175, intervalS: 0.75 },
+        { startS: 240, endS: 270, intervalS: 0.6 },
+      ],
+      upgradeBaseCost: 50,
+      upgradeCostGrowth: 1.5,
+      upgradePriceStep: 2,
+      cratesBaseCost: 40,
+      cratesCostGrowth: 1.5,
+      cratesBatchStep: 3,
+      cratesMaxLevel: 3,
+    });
+  });
+});
+
 describe('validateConfig rejects', () => {
+  const rush = (startS: number, endS: number, intervalS = 1) => ({ startS, endS, intervalS });
   const cases: [string, Partial<EconomyConfig>, RegExp][] = [
     ['an empty id', { id: '' }, /id must be/],
     ['a non-integer cost', { restockCost: 10.5 }, /restockCost must be a positive integer/],
@@ -44,6 +76,14 @@ describe('validateConfig rejects', () => {
     ['startStock above shelfCap', { startStock: 21 }, /startStock must be an integer in \[0, shelfCap\]/],
     ['startCoins below restockCost', { startCoins: 9 }, /startCoins \(9\) must be >= restockCost/],
     ['non-positive unit contribution', { salePrice: 2 }, /salePrice - restockCost\/restockBatch must be > 0/],
+    ['a negative cooldown', { restockCooldown: -1 }, /restockCooldown must be a number >= 0/],
+    ['a zero Crates cost growth', { cratesCostGrowth: 0 }, /cratesCostGrowth must be a positive number/],
+    ['a zero Crates max level', { cratesMaxLevel: 0 }, /cratesMaxLevel must be a positive integer/],
+    ['a largest crate above shelfCap', { cratesBatchStep: 6 }, /cratesMaxLevel \(23\) must be <= shelfCap/],
+    ['a zero rush interval', { rushes: [rush(60, 80, 0)] }, /rushes\[0\]\.intervalS must be positive/],
+    ['overlapping rushes', { rushes: [rush(60, 80), rush(70, 90)] }, /rushes\[1\] must be sorted/],
+    ['a rush past the session end', { rushes: [rush(290, 310)] }, /rushes\[0\] must be sorted/],
+    ['an empty rush window', { rushes: [rush(60, 60)] }, /rushes\[0\] must be sorted/],
   ];
 
   it.each(cases)('%s', (_name, change, message) => {

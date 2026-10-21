@@ -24,35 +24,38 @@ const STEP_LIFT = 3;
 
 const HIDDEN: CustomerPose = { visible: false, arrival: 0, x: 0, scale: 1, lift: 0 };
 
-// Arrivals are at k × intervalMs (k ≥ 1, up to sessionMs). The customer for an arrival walks in
+// `arrivals` is the economy's sorted arrival schedule (ms). The customer for an arrival walks in
 // during the walk time before it, so they reach the counter exactly when the sale happens.
-// Durations shrink with short intervals so two customers never overlap (walk + serve + walk ≤ 80 %).
+// Durations shrink with the gap between two arrivals (rushes), so two customers never overlap:
+// serve + walk out + the next walk in ≤ 80 % of the gap.
 export function customerPose(
   tMs: number,
-  intervalMs: number,
-  sessionMs: number,
+  arrivals: number[],
   lastSaleAt: number, // elapsedMs of the latest sale; a missed sale gets no scale-up
   layout: CustomerLayout,
 ): CustomerPose {
-  const walk = Math.min(WALK_MS, 0.3 * intervalMs);
-  const serve = Math.min(SERVE_MS, 0.2 * intervalMs);
-  const next = (Math.floor(tMs / intervalMs) + 1) * intervalMs;
-  const last = next - intervalMs;
+  const index = arrivals.findIndex((a) => a > tMs); // the next arrival; -1 when none is left
+  const nextIndex = index < 0 ? arrivals.length : index;
+  const next = arrivals[nextIndex];
+  const last = arrivals[nextIndex - 1];
+  const gap = next !== undefined ? next - (last ?? 0) : Infinity; // before `next`, and after `last`
+  const walk = Math.min(WALK_MS, 0.3 * gap);
+  const serve = Math.min(SERVE_MS, 0.2 * gap);
   const lift = (p: number) => Math.abs(Math.sin(p * Math.PI * STEPS)) * STEP_LIFT;
 
-  if (next <= sessionMs && next - tMs <= walk) {
+  if (next !== undefined && next - tMs <= walk) {
     const p = 1 - (next - tMs) / walk;
-    return { visible: true, arrival: next / intervalMs, x: layout.left + (layout.center - layout.left) * p, scale: 1, lift: lift(p) };
+    return { visible: true, arrival: nextIndex + 1, x: layout.left + (layout.center - layout.left) * p, scale: 1, lift: lift(p) };
   }
-  if (last >= intervalMs && last <= sessionMs) {
+  if (last !== undefined) {
     const since = tMs - last;
     if (since < serve) {
       const scale = lastSaleAt === last ? 1 + POP * Math.sin((Math.PI * since) / serve) : 1;
-      return { visible: true, arrival: last / intervalMs, x: layout.center, scale, lift: 0 };
+      return { visible: true, arrival: nextIndex, x: layout.center, scale, lift: 0 };
     }
     if (since < serve + walk) {
       const p = (since - serve) / walk;
-      return { visible: true, arrival: last / intervalMs, x: layout.center + (layout.right - layout.center) * p, scale: 1, lift: lift(p) };
+      return { visible: true, arrival: nextIndex, x: layout.center + (layout.right - layout.center) * p, scale: 1, lift: lift(p) };
     }
   }
   return HIDDEN;

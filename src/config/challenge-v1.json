@@ -1,0 +1,24 @@
+{
+  "id": "challenge-v1",
+  "sessionSeconds": 300,
+  "startCoins": 20,
+  "startStock": 5,
+  "shelfCap": 20,
+  "restockCost": 10,
+  "restockBatch": 5,
+  "restockCooldown": 5,
+  "salePrice": 5,
+  "customerInterval": 4,
+  "rushes": [
+    { "startS": 60, "endS": 80, "intervalS": 1 },
+    { "startS": 150, "endS": 175, "intervalS": 0.75 },
+    { "startS": 240, "endS": 270, "intervalS": 0.6 }
+  ],
+  "upgradeBaseCost": 50,
+  "upgradeCostGrowth": 1.5,
+  "upgradePriceStep": 2,
+  "cratesBaseCost": 40,
+  "cratesCostGrowth": 1.5,
+  "cratesBatchStep": 3,
+  "cratesMaxLevel": 3
+}

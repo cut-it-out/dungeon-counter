@@ -3,12 +3,11 @@ import type { EconomyConfig } from '../config/types';
 import { exportCsv } from '../csv/export';
 import {
   advanceTo,
+  arrivalTimes,
   canRestock,
   canUpgrade,
   createState,
-  intervalMs,
   restock,
-  sessionMs,
   summarize,
   upgrade,
 } from '../economy/economy';
@@ -109,7 +108,7 @@ export class PlayScene extends Phaser.Scene {
 
   private drawCustomer() {
     const t = Math.floor(this.clockMs);
-    const pose = customerPose(t, intervalMs(this.cfg), sessionMs(this.cfg), this.lastSaleAt, WALK);
+    const pose = customerPose(t, arrivalTimes(this.cfg), this.lastSaleAt, WALK);
     this.adventurer.setVisible(pose.visible);
     if (!pose.visible) return;
     // A different adventurer each arrival, cycling through the three sprites.

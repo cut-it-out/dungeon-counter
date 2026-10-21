@@ -30,7 +30,7 @@ Phaser 3 + Vite + TypeScript, Vitest for tests (`environment: 'node'`; economy t
 ```
 index.html            Vite entry; overlay root + canvas container
 src/main.ts           Phaser.Game config
-src/config/           EconomyConfig type, validation, baseline-v1.json (frozen), revised-v1.json, selectConfig
+src/config/           EconomyConfig type, validation, challenge-v1.json (frozen), challenge-v2.json, selectConfig
 src/economy/          pure TypeScript economy, policy and headless session runner (no Phaser imports)
 src/storage/save.ts   per-config localStorage save
 src/log/eventLog.ts   run_id / run_type / config_id wrapper around economy events
@@ -39,5 +39,5 @@ src/scenes/           Phaser scenes (shop scene only; DOM overlay owns the UI)
 src/ui/overlay.ts     HUD, buttons, reason text, pause menu, summary, save status
 public/assets/        confirmed CC0 sprites (credited in CREDITS.md)
 tests/                Vitest
-balancing/            played CSVs, summary.sql, run_sql.py (`uv run --with duckdb balancing/run_sql.py`), notes
+balancing/            played CSVs, configs/baseline-v1.json (frozen idle-loop config, tag idle-loop-v1), summary.sql, run_sql.py (`uv run --with duckdb balancing/run_sql.py`), notes
 ```
