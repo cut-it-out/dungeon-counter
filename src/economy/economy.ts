@@ -102,8 +102,12 @@ export interface SessionSummary {
   closing: number; // closing coin balance
 }
 
-// Summary screen numbers (GDD §3/§5), derived from the event log alone.
-export function summarize(cfg: EconomyConfig, events: EconomyEvent[]): SessionSummary {
+// Summary screen numbers (GDD §3/§5), derived from the event log alone. Accepts log rows
+// too (event typed as string), whose session_start/resume markers have amount 0.
+export function summarize(
+  cfg: EconomyConfig,
+  events: (Omit<EconomyEvent, 'event'> & { event: string })[],
+): SessionSummary {
   const sum = (type: string) => events.filter((e) => e.event === type).reduce((s, e) => s + e.amount, 0);
   const last = events[events.length - 1];
   return {

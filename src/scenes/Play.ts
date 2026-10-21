@@ -1,7 +1,8 @@
 import Phaser from 'phaser';
 import type { EconomyConfig } from '../config/types';
 import { advanceTo, canRestock, canUpgrade, createState, restock, summarize, upgrade } from '../economy/economy';
-import type { EconomyEvent, EconomyState } from '../economy/types';
+import type { EconomyState } from '../economy/types';
+import { markerEvent, newRun, type LogEvent, type RunLog } from '../log/eventLog';
 import * as overlay from '../ui/overlay';
 
 // Shop scene size in design px. The canvas fills only the middle box of the page's flex
@@ -30,7 +31,7 @@ const SHELF_COLOR = 0xb85c42; // Ember Copper trim
 export class PlayScene extends Phaser.Scene {
   private cfg!: EconomyConfig;
   private state!: EconomyState;
-  private log: EconomyEvent[] = [];
+  private run!: RunLog;
   private clockMs = 0;
   private paused = false;
   private ending = false;
@@ -46,7 +47,7 @@ export class PlayScene extends Phaser.Scene {
   create() {
     this.cfg = this.registry.get('config') as EconomyConfig;
     this.state = createState(this.cfg);
-    this.log = [];
+    this.run = newRun(this.cfg);
     this.clockMs = 0;
     this.paused = false;
     this.ending = false;
@@ -64,7 +65,7 @@ export class PlayScene extends Phaser.Scene {
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
       document.removeEventListener('visibilitychange', this.onVisibilityChange);
     });
-    this.render();
+    this.record(markerEvent(this.state, this.cfg, 'session_start'));
   }
 
   update(_time: number, delta: number) {
@@ -75,7 +76,7 @@ export class PlayScene extends Phaser.Scene {
 
     if (this.state.finished) {
       this.ending = true;
-      const summary = summarize(this.cfg, this.log);
+      const summary = summarize(this.cfg, this.run.events);
       if (import.meta.env.DEV) console.table(summary);
       this.time.delayedCall(800, () => this.scene.start('Summary', { summary }));
     }
@@ -97,13 +98,13 @@ export class PlayScene extends Phaser.Scene {
     });
   }
 
-  private record(event: EconomyEvent | null) {
+  private record(event: LogEvent | null) {
     if (!event) return;
-    this.log.push(event);
+    this.run.events.push(event);
     if (import.meta.env.DEV) {
       const e = event;
       console.log(
-        `[${this.cfg.id}] ${(e.elapsedMs / 1000).toFixed(1)}s ${e.event} amount=${e.amount} ` +
+        `[${this.cfg.id} ${this.run.runId}] ${(e.elapsedMs / 1000).toFixed(1)}s ${e.event} amount=${e.amount} ` +
           `coins=${e.coins} stock=${e.stock} level=${e.upgradeLevel} price=${e.price}`,
       );
     }
@@ -156,7 +157,7 @@ export class PlayScene extends Phaser.Scene {
     this.add.image(w / 2, 296, 'counter').setOrigin(0.5, 0).setScale(SCALE);
   }
 
-  private feedback(event: EconomyEvent) {
+  private feedback(event: LogEvent) {
     switch (event.event) {
       case 'sale':
         this.cue();
