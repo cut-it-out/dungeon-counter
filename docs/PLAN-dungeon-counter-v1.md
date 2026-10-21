@@ -108,12 +108,12 @@ Download the Kenney Roguelike/RPG Pack and UI Pack (CC0) into a fresh directory 
 ✔ `npm test`; in the browser: refresh at 2:10 resumes at 2:10 with the same coins/stock; switching tabs for 60 s doesn't move the clock; a finished run survives refresh and still exports.
 
 **S8. CSV export.** P1
-`src/csv/export.ts`: `toCsv(rows)`, filename `dungeon-counter_<config_id>_played_<YYYYMMDD-HHMM>.csv`, Blob + anchor download, `navigator.share({ files })` fallback when `canShare` says so (iOS Safari).
+`src/csv/export.ts`: `toCsv(rows)`, filename `dungeon-counter_<config_id>_played_<YYYYMMDD-HHMM>.csv`, Blob + anchor download, `navigator.share({ files })` fallback when `canShare` says so (iOS Safari). *(Session 5: the share sheet is used only on a coarse pointer (touch) device where `canShare` accepts the file, since desktop Chrome also supports file sharing and would replace the download; S10 confirms the phone behaviour.)*
 `tests/csv.test.ts`: fixture rows → exact string; reconciliation on the fixture.
 ✔ `npm test`; desktop download opens in a spreadsheet with the 10 columns.
 
 **S9. Config selection.** P1
-`src/config/index.ts`: `?config=baseline|revised`; default = baseline until `revised-v1.json` exists **and** is marked accepted in `balancing/notes.md`; the active id in the pause menu and in every CSV row.
+`src/config/index.ts`: `?config=baseline|revised`; default = baseline until `revised-v1.json` exists **and** is marked accepted in `balancing/notes.md`; the active id in the pause menu and in every CSV row. *(Session 5: "marked accepted" is the constant `REVISED_ACCEPTED` in `src/config/index.ts`, flipped together with the note; an unknown or missing `?config=` falls back to the default with a notice on the title, which also shows the active id.)*
 ✔ `?config=baseline` and `?config=revised` (once it exists) load different saves and print their id.
 
 **S10. Phone smoke test.** P1 **[you]**
