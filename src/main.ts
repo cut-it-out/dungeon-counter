@@ -1,15 +1,13 @@
 import Phaser from 'phaser';
 import './style.css';
-import baseline from './config/baseline-v1.json';
-import type { EconomyConfig } from './config/types';
-import { validateConfig } from './config/validate';
+import { selectConfig } from './config/index';
 import { BootScene } from './scenes/Boot';
 import { PlayScene, SCENE_HEIGHT, SCENE_WIDTH } from './scenes/Play';
 import { SummaryScene } from './scenes/Summary';
 import { TitleScene } from './scenes/Title';
 
-// Config selection (?config=) arrives in S9; until then the frozen baseline is used.
-const config = validateConfig(baseline as EconomyConfig);
+// ?config=baseline|revised; the default rule lives in src/config/index.ts.
+const { config, notice } = selectConfig(window.location.search);
 
 const game = new Phaser.Game({
   type: Phaser.AUTO,
@@ -24,3 +22,4 @@ const game = new Phaser.Game({
   scene: [BootScene, TitleScene, PlayScene, SummaryScene],
 });
 game.registry.set('config', config);
+game.registry.set('configNotice', notice);

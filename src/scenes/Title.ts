@@ -14,12 +14,14 @@ export class TitleScene extends Phaser.Scene {
     const { save, malformed } = readSave(browserStorage(), cfg.id);
     const unfinished = save && !save.finished ? save : null;
     const finished = save && save.finished ? save : null;
+    const configNotice = this.registry.get('configNotice') as string | null;
+    const saveNotice = malformed ? 'The saved day could not be read, so a new day starts fresh.' : null;
 
     // Always pass data: Phaser keeps the previous start's data when none is given.
     const startNew = () => this.scene.start('Play', {});
     overlay.showTitle({
       configId: cfg.id,
-      notice: malformed ? 'The saved day could not be read, so a new day starts fresh.' : null,
+      notice: [configNotice, saveNotice].filter(Boolean).join(' ') || null,
       onContinue: unfinished ? () => this.scene.start('Play', { resume: unfinished }) : null,
       onLastSummary: finished ? () => this.scene.start('Summary', { run: runFromSave(finished) }) : null,
       // A new day replaces the saved log, so confirm whenever one exists (GDD §3, §8).
