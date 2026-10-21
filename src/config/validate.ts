@@ -25,6 +25,9 @@ export function validateConfig(cfg: EconomyConfig): EconomyConfig {
 
   if (!(cfg.sessionSeconds > 0)) errors.push(`sessionSeconds must be positive (got ${cfg.sessionSeconds})`);
   if (!(cfg.customerInterval > 0)) errors.push(`customerInterval must be positive (got ${cfg.customerInterval})`);
+  if (cfg.calmSpeedup !== undefined && !(cfg.calmSpeedup > 0 && cfg.calmSpeedup <= 1)) {
+    errors.push(`calmSpeedup must be in (0, 1] (got ${cfg.calmSpeedup})`);
+  }
   if (!(cfg.restockCooldown >= 0) || !Number.isFinite(cfg.restockCooldown)) {
     errors.push(`restockCooldown must be a number >= 0 (got ${cfg.restockCooldown})`);
   }

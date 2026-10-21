@@ -1,10 +1,12 @@
 import { describe, expect, it } from 'vitest';
 import challenge from '../src/config/challenge-v1.json';
+import challengeV2 from '../src/config/challenge-v2.json';
 import type { EconomyConfig } from '../src/config/types';
 import {
   advanceTo,
   arrivalTimes,
   batchAt,
+  calmIntervalMs,
   canRestock,
   canUpgrade,
   canUpgradeCrates,
@@ -319,5 +321,31 @@ describe('summary', () => {
     const state = chState({ stock: 20 });
     const events = advanceTo(state, ch, 75_000); // 15 calm sales, then the rush sells out after 5
     expect(summarize(ch, events).rushes[0]).toEqual({ served: 5, missed: 10 });
+  });
+});
+
+describe('calm speed-up (challenge-v2)', () => {
+  const v2 = challengeV2 as EconomyConfig;
+  const times = arrivalTimes(v2);
+  const gaps = (fromMs: number, toMs: number) => {
+    const inside = times.filter((t) => t > fromMs && t <= toMs);
+    return new Set(inside.slice(1).map((t, i) => t - inside[i]));
+  };
+
+  it('each calm stretch is calmSpeedup times the previous one, rounded to whole ms', () => {
+    expect([0, 1, 2, 3].map((i) => calmIntervalMs(v2, i))).toEqual([4_000, 3_400, 2_890, 2_456]);
+    expect(gaps(0, 60_000)).toEqual(new Set([4_000]));
+    expect(gaps(80_000, 150_000)).toEqual(new Set([3_400]));
+    expect(gaps(175_000, 240_000)).toEqual(new Set([2_890]));
+    expect(gaps(270_000, 300_000)).toEqual(new Set([2_456]));
+  });
+
+  it('has 172 arrivals (69 calm + the same 103 rush), the last at 299.472 s', () => {
+    expect(times).toHaveLength(172);
+    expect(times[times.length - 1]).toBe(299_472);
+  });
+
+  it('leaves a config without calmSpeedup at a constant calm interval', () => {
+    expect([0, 1, 2, 3].map((i) => calmIntervalMs(ch, i))).toEqual([4_000, 4_000, 4_000, 4_000]);
   });
 });

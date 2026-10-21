@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import baseline from '../balancing/configs/baseline-v1.json';
 import challenge from '../src/config/challenge-v1.json';
+import challengeV2 from '../src/config/challenge-v2.json';
 import type { EconomyConfig } from '../src/config/types';
 import { validateConfig } from '../src/config/validate';
 
@@ -61,6 +62,16 @@ describe('challenge-v1', () => {
   });
 });
 
+describe('challenge-v2', () => {
+  it('validates', () => {
+    expect(() => validateConfig(challengeV2 as EconomyConfig)).not.toThrow();
+  });
+
+  it('is challenge-v1 plus calmSpeedup 0.85 (Session 8), nothing else', () => {
+    expect(challengeV2).toEqual({ ...base, id: 'challenge-v2', calmSpeedup: 0.85 });
+  });
+});
+
 describe('validateConfig rejects', () => {
   const rush = (startS: number, endS: number, intervalS = 1) => ({ startS, endS, intervalS });
   const cases: [string, Partial<EconomyConfig>, RegExp][] = [
@@ -80,6 +91,8 @@ describe('validateConfig rejects', () => {
     ['a zero Crates cost growth', { cratesCostGrowth: 0 }, /cratesCostGrowth must be a positive number/],
     ['a zero Crates max level', { cratesMaxLevel: 0 }, /cratesMaxLevel must be a positive integer/],
     ['a largest crate above shelfCap', { cratesBatchStep: 6 }, /cratesMaxLevel \(23\) must be <= shelfCap/],
+    ['a zero calm speed-up', { calmSpeedup: 0 }, /calmSpeedup must be in \(0, 1\]/],
+    ['a calm slow-down', { calmSpeedup: 1.2 }, /calmSpeedup must be in \(0, 1\]/],
     ['a zero rush interval', { rushes: [rush(60, 80, 0)] }, /rushes\[0\]\.intervalS must be positive/],
     ['overlapping rushes', { rushes: [rush(60, 80), rush(70, 90)] }, /rushes\[1\] must be sorted/],
     ['a rush past the session end', { rushes: [rush(290, 310)] }, /rushes\[0\] must be sorted/],

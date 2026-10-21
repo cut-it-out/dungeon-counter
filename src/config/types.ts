@@ -17,7 +17,9 @@ export interface EconomyConfig {
   restockBatch: number; // crate size at Bigger Crates level 0
   restockCooldown: number; // seconds after a restock before the next one
   salePrice: number;
-  customerInterval: number; // calm interval, outside the rushes
+  customerInterval: number; // calm interval, outside the rushes (the first calm stretch)
+  // Each later calm stretch's interval = the previous one × calmSpeedup (Session 8). Absent = 1, constant.
+  calmSpeedup?: number;
   rushes: Rush[];
   // Better Brews: +upgradePriceStep sale price per level.
   upgradeBaseCost: number;

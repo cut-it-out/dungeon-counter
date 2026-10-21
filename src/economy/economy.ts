@@ -24,6 +24,10 @@ export const cratesCostAt = (cfg: EconomyConfig, level: number) =>
 // Arrival schedule (Session 6): the session is cut into calm stretches and rush windows; each
 // stretch places arrivals at its start + k × its interval, up to and including its end. Built in
 // integer ms so no float drift accumulates, and cached because the scene asks every frame.
+// Calm stretch i (0-based) uses customerInterval × calmSpeedup^i (Session 8).
+export const calmIntervalMs = (cfg: EconomyConfig, stretch: number) =>
+  toMs(cfg.customerInterval * (cfg.calmSpeedup ?? 1) ** stretch);
+
 const arrivalCache = new WeakMap<EconomyConfig, number[]>();
 
 export function arrivalTimes(cfg: EconomyConfig): number[] {
@@ -33,14 +37,13 @@ export function arrivalTimes(cfg: EconomyConfig): number[] {
   const add = (fromMs: number, toMsIncl: number, stepMs: number) => {
     for (let t = fromMs + stepMs; t <= toMsIncl; t += stepMs) times.push(t);
   };
-  const calm = toMs(cfg.customerInterval);
   let stretchStart = 0;
-  for (const rush of cfg.rushes) {
-    add(stretchStart, toMs(rush.startS), calm);
+  cfg.rushes.forEach((rush, i) => {
+    add(stretchStart, toMs(rush.startS), calmIntervalMs(cfg, i));
     add(toMs(rush.startS), toMs(rush.endS), toMs(rush.intervalS));
     stretchStart = toMs(rush.endS);
-  }
-  add(stretchStart, sessionMs(cfg), calm);
+  });
+  add(stretchStart, sessionMs(cfg), calmIntervalMs(cfg, cfg.rushes.length));
   arrivalCache.set(cfg, times);
   return times;
 }

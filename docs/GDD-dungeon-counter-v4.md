@@ -59,7 +59,7 @@ Title ── New day ──► Play (5:00) ──► Summary ──► New day
 |---|---|
 | **Stock** | One item: potions. Integer count in `[0, shelfCap]`. |
 | **Restock** | Spend exactly `restockCost` to add one crate of `batchAt(cratesLevel)` potions immediately. Available only if `stock <= shelfCap - batch`, `coins >= restockCost` and the **cooldown** has ended: `restockCooldown` seconds of game time after the previous restock. No partial purchase. |
-| **Customers** | Calm stretches have one arrival every `customerInterval`; each **rush window** has one every `intervalS`. Each stretch places arrivals at its start + k × its interval, up to and including its end (a rush's start is exclusive). An arrival buys one potion if available; otherwise `missed_sale`. Deterministic, no randomness or pathfinding. |
+| **Customers** | Calm stretch *i* (0-based, counting the stretches around the rushes) has one arrival every `customerInterval × calmSpeedup^i`, rounded to whole ms; without `calmSpeedup` the calm interval is constant (Session 8); each **rush window** has one every `intervalS`. Each stretch places arrivals at its start + k × its interval, up to and including its end (a rush's start is exclusive). An arrival buys one potion if available; otherwise `missed_sale`. Deterministic, no randomness or pathfinding. |
 | **Better Brews** | Pay `upgradeCostAt(level)` to raise the sale price by `upgradePriceStep`. No level cap. |
 | **Bigger Crates** | Pay `cratesCostAt(level)` to raise the crate size by `cratesBatchStep`, at the same `restockCost`. Capped at `cratesMaxLevel`. A bigger crate needs more free slots, so it can only be bought onto a lower shelf. |
 | **Dead-shop guard** | Unchanged in principle from v3 §15: an upgrade is blocked when even selling the whole shelf at the price *after* it could not pay for a restock: `coins − cost + stock × priceAfter < restockCost`. For Better Brews `priceAfter = salePriceAt(level + 1)`; for Bigger Crates the price is unchanged. Reason text *"Need Nc to stay stocked"*. A cooldown never makes the shop dead: it ends on its own. |
@@ -83,6 +83,7 @@ Title ── New day ──► Play (5:00) ──► Summary ──► New day
 - `cratesCostAt(C) = round(cratesBaseCost × cratesCostGrowth ^ C)`
 - **Net profit** = closing coin balance − `startCoins` = gross sales revenue − restock spending − upgrade spending. This is the score.
 - Refill rate during a rush, at most: `batchAt(C) / restockCooldown` potions per second, plus whatever is on the shelf when the rush starts.
+- Calm interval of stretch i: `round(customerInterval × calmSpeedup^i)` ms; `calmSpeedup` is optional, in (0, 1], and absent means 1.
 
 ### Config files
 
@@ -106,6 +107,10 @@ Proposed by Claude Code in Session 6 without simulation, accepted by the develop
 | Bigger Crates `cratesBaseCost` / `cratesCostGrowth` / `cratesBatchStep` / `cratesMaxLevel` | 40 / 1.5 / 3 / 3 |
 
 **Arrival count:** 55 calm + 20 + 33 + 50 rush = **158** opportunities (v3: 100), the last at 298 s. **Design intent, not a result:** at the base crate, restocking refills at most 1 potion/s; rush 1 (1/s) just keeps pace, rushes 2 (1.33/s) and 3 (1.67/s) outrun it by about 8 and 20 potions, which a full 20-slot shelf or bigger crates must cover.
+
+### Revision: `challenge-v2` (Session 8)
+
+`challenge-v1` plus **`calmSpeedup` 0.85**, nothing else: calm stretches every 4 s → 3.4 s → 2.89 s → 2.456 s, giving 69 calm + 103 rush = **172** arrivals, the last at 299.472 s. Reason: the developer's play of `challenge-v1` found the calm stretches between rushes slow. Hypothesis, old/new values and evidence in `balancing/notes.md`. `?config=revised` plays it; the public default stays `challenge-v1` until it is accepted.
 
 ## 6. Telemetry and balancing questions
 
