@@ -63,7 +63,7 @@ Title ── New day ──► Play (5:00) ──► Summary ──► New day
 | **Restock** | Spend exactly `restockCost` to add exactly `restockBatch` immediately. Available only if `coins >= restockCost` **and** `stock <= shelfCap - restockBatch`. No partial purchase or proportional price. |
 | **Customers** | One arrival at each scheduled game-time point: `customerInterval`, `2 × customerInterval`, etc. An arrival buys exactly one potion if available; otherwise record `missed_sale`. No randomness/pathfinding. |
 | **Better Brews** | Pay `upgradeCost(level)` to increase the sale price by `upgradePriceStep`. The level has no fixed cap; the rising cost naturally constrains it within five minutes. |
-| **Dead-shop guard** | The shop is stuck only when `stock == 0` **and** `coins < restockCost`: no sales can happen and no restock can be bought. Upgrade is therefore disabled only when buying it would create exactly that state: **`stock == 0 && coins - upgradeCost(level) < restockCost`**. With stock on the shelf the player may spend down freely; sales will replenish coins. Display *“Keep 10c for stock”* (computed from config) when this is the blocker. The guard is a shared mechanic across configs. |
+| **Dead-shop guard** | The shop is stuck only when `stock == 0` **and** `coins < restockCost`: no sales can happen and no restock can be bought. Upgrade is therefore disabled only when buying it would make that state unavoidable, i.e. when even selling the whole shelf at the new price could not pay for a restock: **`coins - upgradeCost(level) + stock * salePriceAt(level + 1) < restockCost`** (at `stock == 0` this is `coins - upgradeCost(level) < restockCost`). Otherwise the player may spend down freely. Display *“Need 53c to stay stocked”* (the coins at which the upgrade unlocks, computed from state and config) when this is the blocker. The guard is a shared mechanic across configs. *(Amended Session 4, see §15.)* |
 | **Timer** | Exactly `sessionSeconds` of **active game time**. Pause on menu, tab hidden/app switch and browser closed; **no offline gains**. |
 
 **Important UI rules:** When the shelf holds 16–19/20 items and the batch is 5, say **“Need 5 free slots”** or **“Restock at 15/20”**, *not* “Shelf full.” When coins are insufficient, show **“Need 10c”**. If an upgrade is blocked by the dead-shop guard, distinguish it from a normal affordability failure.
@@ -144,7 +144,7 @@ The numbers below are **unchanged from v1**. The v1 document attributes them to 
 
 **Why idle time and surplus are computable from the rows:** the economy is deterministic and every coin or stock change is itself a row, so the state is constant between consecutive rows. Availability and surplus at any moment are pure functions of the preceding row and the config. In SQL this is one `LEAD(elapsed_s)` window plus a `CASE` on the row's state. Game time doesn't advance while paused, so pauses need no special handling. `resume` and `session_start` rows carry state too, so they bound the intervals correctly.
 
-**Comparison protocol:** Use approximately the **same manual strategy** in all evidence runs: restock when stock reaches 1 and affordable; buy an upgrade as soon as the guard allows it; otherwise wait. Record any deviation in `balancing/notes.md`. This reduces (but does not eliminate) player-strategy differences between baseline and revised. Avoid treating two tiny samples as statistically significant.
+**Comparison protocol:** Use approximately the **same manual strategy** in all evidence runs: restock when stock is 1 or 0 and affordable; otherwise buy an upgrade as soon as the guard allows it; otherwise wait. When both are possible, restock first. Record any deviation in `balancing/notes.md`. This reduces (but does not eliminate) player-strategy differences between baseline and revised. Avoid treating two tiny samples as statistically significant.
 
 ## 7. Screen layout and visual direction
 
@@ -307,6 +307,15 @@ Claude Code reviewed v2 against v1 and the brief; I accepted these changes.
 | 4 | **Stated the 3-day vs 2-day deviation from the brief.** | The brief's cut rules were written against a two-day box; the case study should say the box was extended. |
 | 5 | **Added the Gold bound to the sanity check.** | v2 said the check did not establish impossibility; a two-line bound does for Gold. Supports moving medals to P2 without touching the frozen numbers. |
 | 6 | **Named the provenance record for the baseline.** | Build log Session 2 plus the unmodified v1 commit are the artefacts v2 change 16 asked to preserve. |
+
+## 15. Amendments after v3 (Session 4, 20–21 October 2026)
+
+Found during implementation; decided by me. The v3 text above is edited in place where noted.
+
+| # | Change | Why |
+|---|---|---|
+| 1 | **Dead-shop guard counts the shelf** (§4): block an upgrade when `coins − upgradeCost + stock × salePriceAt(level + 1) < restockCost`; reason text “Need Nc to stay stocked” with the unlock amount. | The v3 rule only checked `stock == 0`. At stock 1 with 52c on `baseline-v1`, a 50c upgrade left 2c; the last sale at 7c left stock 0 and 9c, a dead shop, failing the §11 acceptance check. The new rule is identical at stock 0 and still lets the player spend aggressively. Chosen over keeping the v3 rule and documenting the hole, and over logging a `stuck` event. |
+| 2 | **Play policy wording** (§6): restock at stock 1 *or 0*; restock before upgrade when both are possible. | “Restock when stock reaches 1” never refills a shelf that hit 0, and the action order changes the trajectory, so played runs and the policy test must share it. |
 
 ---
 

@@ -1,5 +1,5 @@
 import type { EconomyConfig } from '../config/types';
-import { priceAt, sessionMs, upgradeCostAt, type SessionSummary } from '../economy/economy';
+import { priceAt, sessionMs, upgradeCostAt, upgradeSafeAt, type SessionSummary } from '../economy/economy';
 import type { Availability, BlockReason, EconomyState } from '../economy/types';
 
 // DOM overlay (plan decision B): HUD, action buttons, reason text, pause menu, title and summary.
@@ -21,14 +21,15 @@ const formatClock = (ms: number) => {
   return `${Math.floor(total / 60)}:${String(total % 60).padStart(2, '0')}`;
 };
 
-export function reasonText(reason: BlockReason, cfg: EconomyConfig, cost: number): string {
+// `coins` is the action's cost for need_coins and the guard's unlock amount for dead_shop_guard.
+export function reasonText(reason: BlockReason, cfg: EconomyConfig, coins: number): string {
   switch (reason) {
     case 'need_coins':
-      return `Need ${cost}c`;
+      return `Need ${coins}c`;
     case 'need_slots':
       return `Need ${cfg.restockBatch} free slots`;
     case 'dead_shop_guard':
-      return `Keep ${cfg.restockCost}c for stock`;
+      return `Need ${coins}c to stay stocked`;
   }
 }
 
@@ -83,7 +84,9 @@ export function renderPlay(
     el<HTMLButtonElement>('upgrade-btn'),
     el('upgrade-reason'),
     upgrade,
-    upgrade.ok ? '' : reasonText(upgrade.reason, cfg, cost),
+    upgrade.ok
+      ? ''
+      : reasonText(upgrade.reason, cfg, upgrade.reason === 'dead_shop_guard' ? upgradeSafeAt(state, cfg) : cost),
   );
 }
 

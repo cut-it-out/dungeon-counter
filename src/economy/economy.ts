@@ -71,11 +71,17 @@ export function canRestock(state: EconomyState, cfg: EconomyConfig): Availabilit
   return { ok: true };
 }
 
-// Dead-shop guard (GDD §4): block only if the upgrade would leave stock 0 and coins < restockCost.
+// Coins at which an upgrade stops creating a dead shop: after paying for it, the coins left plus
+// selling out the shelf at the new price must still cover one restock.
+export const upgradeSafeAt = (state: EconomyState, cfg: EconomyConfig) =>
+  upgradeCostAt(cfg, state.upgradeLevel) + cfg.restockCost - state.stock * priceAt(cfg, state.upgradeLevel + 1);
+
+// Dead-shop guard (GDD §4, option B, Session 4): block an upgrade only if even selling the whole
+// shelf afterwards could not pay for a restock. At stock 0 this is coins - cost < restockCost.
 export function canUpgrade(state: EconomyState, cfg: EconomyConfig): Availability {
   const cost = upgradeCostAt(cfg, state.upgradeLevel);
   if (state.coins < cost) return { ok: false, reason: 'need_coins' };
-  if (state.stock === 0 && state.coins - cost < cfg.restockCost) return { ok: false, reason: 'dead_shop_guard' };
+  if (state.coins < upgradeSafeAt(state, cfg)) return { ok: false, reason: 'dead_shop_guard' };
   return { ok: true };
 }
 

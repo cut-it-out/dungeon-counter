@@ -10,6 +10,7 @@ import {
   restock,
   upgrade,
   upgradeCostAt,
+  upgradeSafeAt,
 } from '../src/economy/economy';
 import type { EconomyEvent, EconomyState } from '../src/economy/types';
 
@@ -125,6 +126,26 @@ describe('upgrade and dead-shop guard', () => {
 
   it('reports need_coins before the guard', () => {
     expect(canUpgrade(stateWith({ stock: 0, coins: 49 }), cfg)).toEqual({ ok: false, reason: 'need_coins' });
+  });
+
+  it('is blocked at stock 1, coins 52: 2c left + one 7c sale < 10c restock', () => {
+    const state = stateWith({ stock: 1, coins: 52 });
+    expect(upgradeSafeAt(state, cfg)).toBe(53);
+    expect(canUpgrade(state, cfg)).toEqual({ ok: false, reason: 'dead_shop_guard' });
+    expect(canUpgrade(stateWith({ stock: 1, coins: 53 }), cfg)).toEqual({ ok: true });
+  });
+
+  it('never allows an upgrade after which selling out cannot fund a restock', () => {
+    for (let level = 0; level <= 5; level++) {
+      for (let stock = 0; stock <= cfg.shelfCap; stock++) {
+        for (let coins = 0; coins <= 400; coins++) {
+          const state = stateWith({ stock, coins, upgradeLevel: level });
+          if (!canUpgrade(state, cfg).ok) continue;
+          upgrade(state, cfg);
+          expect(state.coins + state.stock * priceAt(cfg, state.upgradeLevel)).toBeGreaterThanOrEqual(cfg.restockCost);
+        }
+      }
+    }
   });
 });
 
