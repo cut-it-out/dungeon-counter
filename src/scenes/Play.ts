@@ -1,11 +1,22 @@
 import Phaser from 'phaser';
 import type { EconomyConfig } from '../config/types';
 import { exportCsv } from '../csv/export';
-import { advanceTo, canRestock, canUpgrade, createState, restock, summarize, upgrade } from '../economy/economy';
+import {
+  advanceTo,
+  canRestock,
+  canUpgrade,
+  createState,
+  intervalMs,
+  restock,
+  sessionMs,
+  summarize,
+  upgrade,
+} from '../economy/economy';
 import type { EconomyState } from '../economy/types';
 import { markerEvent, newRun, type LogEvent, type RunLog } from '../log/eventLog';
 import { browserStorage, clearSave, runFromSave, stateFromSave, toSave, writeSave, type SaveData } from '../storage/save';
 import * as overlay from '../ui/overlay';
+import { customerPose } from './customer';
 
 // Shop scene size in design px. The canvas fills only the middle box of the page's flex
 // column (HUD / scene / controls), so it is smaller than the 390×844 page.
@@ -21,6 +32,9 @@ const SCALE = 3;
 const ADVENTURER_SCALE = 4;
 const POTION_STEP = 36; // the bottle fills only the middle ~6 px of its tile, so slots overlap
 const ADVENTURERS = ['adventurer-0', 'adventurer-1', 'adventurer-2'];
+const FLOOR_Y = 300; // the adventurer's feet, just behind the counter's top edge
+// Walk path: fully off-screen (sprite is 64 px wide at 4×) → counter → off-screen right.
+const WALK = { left: -40, center: SCENE_WIDTH / 2, right: SCENE_WIDTH + 40 };
 
 // Tints darken the light Kenney tiles towards Dungeon Ink so the HUD stays the focus.
 const TINTS = {
@@ -40,7 +54,7 @@ export class PlayScene extends Phaser.Scene {
   private slots: Phaser.GameObjects.Image[] = [];
   private shownStock = -1;
   private adventurer!: Phaser.GameObjects.Image;
-  private arrivals = 0;
+  private lastSaleAt = -1;
 
   constructor() {
     super('Play');
@@ -56,7 +70,7 @@ export class PlayScene extends Phaser.Scene {
     this.paused = false;
     this.ending = false;
     this.shownStock = -1;
-    this.arrivals = 0;
+    this.lastSaleAt = this.run.events.reduce((t, e) => (e.event === 'sale' ? e.elapsedMs : t), -1);
 
     this.drawShop();
 
@@ -76,8 +90,12 @@ export class PlayScene extends Phaser.Scene {
   }
 
   update(_time: number, delta: number) {
-    if (this.paused || this.ending) return;
+    if (this.paused) return;
+    // The clock keeps running through the closing delay so the last customer keeps walking;
+    // the economy is finished by then and ignores it.
     this.clockMs += Math.min(delta, MAX_FRAME_MS);
+    this.drawCustomer();
+    if (this.ending) return;
     for (const event of advanceTo(this.state, this.cfg, Math.floor(this.clockMs))) this.record(event);
     this.render();
 
@@ -87,6 +105,18 @@ export class PlayScene extends Phaser.Scene {
       if (import.meta.env.DEV) console.table(summary);
       this.time.delayedCall(800, () => this.scene.start('Summary', { run: this.run }));
     }
+  }
+
+  private drawCustomer() {
+    const t = Math.floor(this.clockMs);
+    const pose = customerPose(t, intervalMs(this.cfg), sessionMs(this.cfg), this.lastSaleAt, WALK);
+    this.adventurer.setVisible(pose.visible);
+    if (!pose.visible) return;
+    // A different adventurer each arrival, cycling through the three sprites.
+    this.adventurer
+      .setTexture(ADVENTURERS[(pose.arrival - 1) % ADVENTURERS.length])
+      .setPosition(pose.x, FLOOR_Y - pose.lift)
+      .setScale(ADVENTURER_SCALE * pose.scale);
   }
 
   private onVisibilityChange = () => {
@@ -170,21 +200,20 @@ export class PlayScene extends Phaser.Scene {
 
     // Adventurer cue stands behind the counter; the counter is drawn after it so it overlaps.
     this.adventurer = this.add
-      .image(w / 2, 300, ADVENTURERS[0])
+      .image(WALK.left, FLOOR_Y, ADVENTURERS[0])
       .setOrigin(0.5, 1)
       .setScale(ADVENTURER_SCALE)
-      .setAlpha(0);
+      .setVisible(false);
     this.add.image(w / 2, 296, 'counter').setOrigin(0.5, 0).setScale(SCALE);
   }
 
   private feedback(event: LogEvent) {
     switch (event.event) {
       case 'sale':
-        this.cue();
+        this.lastSaleAt = event.elapsedMs; // the customer scales up at the counter
         this.popup(`+${event.amount}c`, '#E8B85B', 222);
         break;
       case 'missed_sale':
-        this.cue();
         this.popup('Out of stock', '#F3E6C9', 222);
         break;
       case 'restock':
@@ -197,15 +226,6 @@ export class PlayScene extends Phaser.Scene {
         this.popup('Shop closed', '#F3E6C9', 370);
         break;
     }
-  }
-
-  private cue() {
-    // A different adventurer each arrival, cycling through the three sprites.
-    this.adventurer.setTexture(ADVENTURERS[this.arrivals % ADVENTURERS.length]);
-    this.arrivals += 1;
-    this.tweens.killTweensOf(this.adventurer);
-    this.adventurer.setAlpha(1).setY(300);
-    this.tweens.add({ targets: this.adventurer, alpha: 0, y: 292, duration: 900, ease: 'Quad.easeIn' });
   }
 
   private popup(text: string, color: string, y: number) {
