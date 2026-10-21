@@ -124,3 +124,43 @@ export function readSave(storage: StorageLike | null, configId: string): LoadRes
     return { save: null, malformed: true };
   }
 }
+
+// Personal best (Session 6): the highest net profit per config, under its own key so it survives
+// New day and Reset. runId marks which run set it, so re-opening that run's summary still says
+// "New best!" without writing again.
+export interface Best {
+  profit: number;
+  runId: string;
+}
+
+export const bestKey = (configId: string) => `dungeon-counter-best:v1:${configId}`;
+
+export function readBest(storage: StorageLike | null, configId: string): Best | null {
+  if (!storage) return null;
+  try {
+    const parsed: unknown = JSON.parse(storage.getItem(bestKey(configId)) ?? 'null');
+    if (typeof parsed !== 'object' || parsed === null) return null;
+    const b = parsed as Record<string, unknown>;
+    return isInt(b.profit) && typeof b.runId === 'string' ? { profit: b.profit as number, runId: b.runId } : null;
+  } catch {
+    return null;
+  }
+}
+
+// Called with every finished run's profit; returns the best to show and whether this run holds it.
+export function recordBest(
+  storage: StorageLike | null,
+  configId: string,
+  runId: string,
+  profit: number,
+): { best: Best; isNew: boolean } {
+  const previous = readBest(storage, configId);
+  if (previous && previous.profit >= profit) return { best: previous, isNew: previous.runId === runId };
+  const best = { profit, runId };
+  try {
+    storage?.setItem(bestKey(configId), JSON.stringify(best));
+  } catch {
+    // Best-effort like the save: the summary still shows this run as the best it knows.
+  }
+  return { best, isNew: true };
+}

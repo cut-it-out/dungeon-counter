@@ -4,8 +4,11 @@ import type { EconomyConfig } from '../src/config/types';
 import { advanceTo, createState, restock } from '../src/economy/economy';
 import { markerEvent, newRun } from '../src/log/eventLog';
 import {
+  bestKey,
   clearSave,
+  readBest,
   readSave,
+  recordBest,
   runFromSave,
   saveKey,
   stateFromSave,
@@ -121,5 +124,48 @@ describe('save / resume', () => {
     writeSave(storage, toSave(state, run));
     expect(clearSave(storage, cfg.id)).toBe(true);
     expect(storage.data.size).toBe(0);
+  });
+});
+
+describe('personal best', () => {
+  it('uses its own per-config key', () => {
+    expect(bestKey('challenge-v1')).toBe('dungeon-counter-best:v1:challenge-v1');
+    expect(bestKey('challenge-v1')).not.toBe(saveKey('challenge-v1'));
+  });
+
+  it('records the first finished run as the best', () => {
+    const storage = memoryStorage();
+    expect(readBest(storage, cfg.id)).toBeNull();
+    expect(recordBest(storage, cfg.id, 'run-0001', 300)).toEqual({ best: { profit: 300, runId: 'run-0001' }, isNew: true });
+    expect(readBest(storage, cfg.id)).toEqual({ profit: 300, runId: 'run-0001' });
+  });
+
+  it('replaces it only with a higher profit', () => {
+    const storage = memoryStorage();
+    recordBest(storage, cfg.id, 'run-0001', 300);
+    expect(recordBest(storage, cfg.id, 'run-0002', 250)).toEqual({ best: { profit: 300, runId: 'run-0001' }, isNew: false });
+    expect(recordBest(storage, cfg.id, 'run-0003', 300).isNew).toBe(false);
+    expect(recordBest(storage, cfg.id, 'run-0004', 301)).toEqual({ best: { profit: 301, runId: 'run-0004' }, isNew: true });
+  });
+
+  it('still says new best when the record run is shown again', () => {
+    const storage = memoryStorage();
+    recordBest(storage, cfg.id, 'run-0001', 300);
+    expect(recordBest(storage, cfg.id, 'run-0001', 300)).toEqual({ best: { profit: 300, runId: 'run-0001' }, isNew: true });
+  });
+
+  it('survives clearing the run save', () => {
+    const storage = memoryStorage();
+    recordBest(storage, cfg.id, 'run-0001', 300);
+    clearSave(storage, cfg.id);
+    expect(readBest(storage, cfg.id)).toEqual({ profit: 300, runId: 'run-0001' });
+  });
+
+  it('ignores malformed data and blocked storage', () => {
+    const storage = memoryStorage();
+    storage.setItem(bestKey(cfg.id), '{"profit":"lots"}');
+    expect(readBest(storage, cfg.id)).toBeNull();
+    expect(readBest(throwing, cfg.id)).toBeNull();
+    expect(recordBest(throwing, cfg.id, 'run-0001', 10)).toEqual({ best: { profit: 10, runId: 'run-0001' }, isNew: true });
   });
 });
