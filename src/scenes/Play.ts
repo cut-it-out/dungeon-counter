@@ -13,15 +13,19 @@ export const SCENE_HEIGHT = 400;
 // minutes of game time on the next frame.
 const MAX_FRAME_MS = 250;
 
-const COLORS = {
-  wall: 0x2c3344,
-  floor: 0x3a3330,
-  shelf: 0xb85c42,
-  counter: 0x7a4a32,
-  potion: 0x39a68d,
-  slot: 0x4a5368,
-  adventurer: 0xe8b85b,
+// Sprites are 16 px pixel art: scenery and potions at 3×, the adventurer at 4× so it reads on a phone.
+const SCALE = 3;
+const ADVENTURER_SCALE = 4;
+const POTION_STEP = 36; // the bottle fills only the middle ~6 px of its tile, so slots overlap
+const ADVENTURERS = ['adventurer-0', 'adventurer-1', 'adventurer-2'];
+
+// Tints darken the light Kenney tiles towards Dungeon Ink so the HUD stays the focus.
+const TINTS = {
+  wall: 0x4a5266,
+  floor: 0x8a7468,
+  emptySlot: 0x222836,
 };
+const SHELF_COLOR = 0xb85c42; // Ember Copper trim
 
 export class PlayScene extends Phaser.Scene {
   private cfg!: EconomyConfig;
@@ -30,9 +34,10 @@ export class PlayScene extends Phaser.Scene {
   private clockMs = 0;
   private paused = false;
   private ending = false;
-  private slots: Phaser.GameObjects.Rectangle[] = [];
+  private slots: Phaser.GameObjects.Image[] = [];
   private shownStock = -1;
-  private adventurer!: Phaser.GameObjects.Rectangle;
+  private adventurer!: Phaser.GameObjects.Image;
+  private arrivals = 0;
 
   constructor() {
     super('Play');
@@ -46,6 +51,7 @@ export class PlayScene extends Phaser.Scene {
     this.paused = false;
     this.ending = false;
     this.shownStock = -1;
+    this.arrivals = 0;
 
     this.drawShop();
 
@@ -110,46 +116,55 @@ export class PlayScene extends Phaser.Scene {
     if (this.state.stock !== this.shownStock) {
       this.shownStock = this.state.stock;
       this.slots.forEach((slot, i) => {
-        const filled = i < this.state.stock;
-        slot.setFillStyle(filled ? COLORS.potion : COLORS.slot, filled ? 1 : 0.35);
+        // Empty slots show a dark silhouette so shelf capacity stays visible.
+        if (i < this.state.stock) slot.clearTint().setAlpha(1);
+        else slot.setTint(TINTS.emptySlot).setAlpha(0.5);
       });
     }
   }
 
   private drawShop() {
     const w = SCENE_WIDTH;
-    this.add.rectangle(0, 0, w, 270, COLORS.wall).setOrigin(0);
-    this.add.rectangle(0, 270, w, SCENE_HEIGHT - 270, COLORS.floor).setOrigin(0);
+    const tile = 16 * SCALE;
+    this.add.tileSprite(0, 0, w, 300, 'wall').setOrigin(0).setTileScale(SCALE).setTint(TINTS.wall);
+    this.add.tileSprite(0, 300, w, SCENE_HEIGHT - 300, 'floor').setOrigin(0).setTileScale(SCALE).setTint(TINTS.floor);
 
-    // Shelf: two planks of slots, one slot per potion of capacity.
+    // Stall awning across the top (striped row of the 16×32 sprite only).
+    this.add.tileSprite(0, 0, w, tile, 'awning', 0).setOrigin(0).setTileScale(SCALE);
+
+    // Shelf: two planks, one potion slot per unit of capacity.
     const perRow = Math.ceil(this.cfg.shelfCap / 2);
-    const slotW = 24;
-    const gap = 8;
-    const rowWidth = perRow * slotW + (perRow - 1) * gap;
+    const rowWidth = (perRow - 1) * POTION_STEP + tile;
     const left = (w - rowWidth) / 2;
+    const rowTops = [62, 142];
     this.slots = [];
     for (let i = 0; i < this.cfg.shelfCap; i++) {
       const row = Math.floor(i / perRow);
       const col = i % perRow;
-      const y = 40 + row * 80;
-      this.slots.push(this.add.rectangle(left + col * (slotW + gap), y, slotW, 40, COLORS.slot).setOrigin(0));
+      this.slots.push(this.add.image(left + col * POTION_STEP, rowTops[row], 'potion').setOrigin(0).setScale(SCALE));
     }
-    for (const y of [82, 162]) this.add.rectangle(left - 12, y, rowWidth + 24, 8, COLORS.shelf).setOrigin(0);
+    for (const top of rowTops) {
+      this.add.rectangle(left, top + tile - 4, rowWidth, 8, SHELF_COLOR).setOrigin(0);
+    }
 
-    // Counter and the adventurer cue (a placeholder until the sprites arrive in S5a).
-    this.adventurer = this.add.rectangle(w / 2, 250, 44, 80, COLORS.adventurer).setAlpha(0);
-    this.add.rectangle(40, 290, w - 80, 50, COLORS.counter).setOrigin(0);
+    // Adventurer cue stands behind the counter; the counter is drawn after it so it overlaps.
+    this.adventurer = this.add
+      .image(w / 2, 300, ADVENTURERS[0])
+      .setOrigin(0.5, 1)
+      .setScale(ADVENTURER_SCALE)
+      .setAlpha(0);
+    this.add.image(w / 2, 296, 'counter').setOrigin(0.5, 0).setScale(SCALE);
   }
 
   private feedback(event: EconomyEvent) {
     switch (event.event) {
       case 'sale':
         this.cue();
-        this.popup(`+${event.amount}c`, '#E8B85B', 190);
+        this.popup(`+${event.amount}c`, '#E8B85B', 222);
         break;
       case 'missed_sale':
         this.cue();
-        this.popup('Out of stock', '#F3E6C9', 190);
+        this.popup('Out of stock', '#F3E6C9', 222);
         break;
       case 'restock':
         this.popup(`+${this.cfg.restockBatch} potions`, '#39A68D', 370);
@@ -164,9 +179,12 @@ export class PlayScene extends Phaser.Scene {
   }
 
   private cue() {
+    // A different adventurer each arrival, cycling through the three sprites.
+    this.adventurer.setTexture(ADVENTURERS[this.arrivals % ADVENTURERS.length]);
+    this.arrivals += 1;
     this.tweens.killTweensOf(this.adventurer);
-    this.adventurer.setAlpha(1).setY(250);
-    this.tweens.add({ targets: this.adventurer, alpha: 0, y: 240, duration: 900, ease: 'Quad.easeIn' });
+    this.adventurer.setAlpha(1).setY(300);
+    this.tweens.add({ targets: this.adventurer, alpha: 0, y: 292, duration: 900, ease: 'Quad.easeIn' });
   }
 
   private popup(text: string, color: string, y: number) {
