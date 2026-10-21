@@ -113,6 +113,24 @@ button {
   font-variant-numeric: tabular-nums;
 }
 
+/* Rush countdown under the timer; a copper badge while the rush is on. */
+.rush {
+  width: fit-content;
+  min-height: 24px;
+  margin: 2px auto 0;
+  padding: 2px 10px;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.rush.active {
+  background: var(--copper);
+  color: var(--parchment);
+  letter-spacing: 0.04em;
+}
+
 #scene {
   flex: 1;
   min-height: 0;
@@ -133,9 +151,19 @@ button {
   padding: 8px 12px;
 }
 
-.upgrade-head {
+.upgrade-row {
   display: flex;
   justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.upgrade-row + .upgrade-row {
+  margin-top: 2px;
+}
+
+.upgrade-head {
+  font-size: 14px;
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -144,13 +172,13 @@ button {
 .upgrade-info {
   font-size: 15px;
   font-variant-numeric: tabular-nums;
-  margin-top: 2px;
 }
 
+/* Three actions: Restock | Brews | Crates. */
 .actions {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 8px;
   margin-top: 10px;
 }
 
@@ -176,6 +204,11 @@ button {
   background: var(--gold);
 }
 
+.action-btn.crates {
+  background: var(--parchment);
+  border-color: var(--copper);
+}
+
 .action-btn:disabled {
   background: transparent;
   color: var(--parchment);
@@ -191,8 +224,12 @@ button {
   border-color: var(--gold);
 }
 
+.action-btn.crates:disabled {
+  border-color: var(--copper);
+}
+
 .action-label {
-  font-size: 17px;
+  font-size: 15px;
   font-weight: 800;
   text-transform: uppercase;
 }
@@ -206,7 +243,7 @@ button {
 .reason {
   min-height: 20px;
   margin-top: 4px;
-  font-size: 14px;
+  font-size: 13px;
   text-align: center;
 }
 
@@ -349,4 +386,47 @@ button {
   border-top: 2px solid var(--copper);
   font-weight: 800;
   padding-top: 10px;
+}
+
+/* Summary headline: profit is the score (Session 6), with the personal best under it. */
+.profit {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-top: 4px;
+}
+
+.profit-label {
+  font-size: 18px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.profit-value {
+  font-size: 34px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.best {
+  margin: 0;
+  min-height: 22px;
+  font-weight: 700;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.best.new {
+  color: var(--copper);
+}
+
+.best[hidden] {
+  display: none;
+}
+
+#title-panel .best {
+  margin: -12px 0 24px;
+  text-align: center;
+  color: var(--gold);
 }

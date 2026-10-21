@@ -4,12 +4,15 @@ import { exportCsv } from '../csv/export';
 import {
   advanceTo,
   arrivalTimes,
+  batchAt,
   canRestock,
   canUpgrade,
+  canUpgradeCrates,
   createState,
   restock,
   summarize,
   upgrade,
+  upgradeCrates,
 } from '../economy/economy';
 import type { EconomyState } from '../economy/types';
 import { markerEvent, newRun, type LogEvent, type RunLog } from '../log/eventLog';
@@ -76,6 +79,7 @@ export class PlayScene extends Phaser.Scene {
     overlay.showPlay({
       onRestock: () => this.record(restock(this.state, this.cfg)),
       onUpgrade: () => this.record(upgrade(this.state, this.cfg)),
+      onCrates: () => this.record(upgradeCrates(this.state, this.cfg)),
       onPause: () => this.pause(),
     });
     overlay.setSaveStatus(null);
@@ -154,7 +158,7 @@ export class PlayScene extends Phaser.Scene {
       const e = event;
       console.log(
         `[${this.cfg.id} ${this.run.runId}] ${(e.elapsedMs / 1000).toFixed(1)}s ${e.event} amount=${e.amount} ` +
-          `coins=${e.coins} stock=${e.stock} level=${e.upgradeLevel} price=${e.price}`,
+          `coins=${e.coins} stock=${e.stock} level=${e.upgradeLevel} price=${e.price} crates=${e.cratesLevel}`,
       );
     }
     this.feedback(event);
@@ -162,7 +166,13 @@ export class PlayScene extends Phaser.Scene {
   }
 
   private render() {
-    overlay.renderPlay(this.state, this.cfg, canRestock(this.state, this.cfg), canUpgrade(this.state, this.cfg));
+    overlay.renderPlay(
+      this.state,
+      this.cfg,
+      canRestock(this.state, this.cfg),
+      canUpgrade(this.state, this.cfg),
+      canUpgradeCrates(this.state, this.cfg),
+    );
     if (this.state.stock !== this.shownStock) {
       this.shownStock = this.state.stock;
       this.slots.forEach((slot, i) => {
@@ -216,10 +226,13 @@ export class PlayScene extends Phaser.Scene {
         this.popup('Out of stock', '#F3E6C9', 222);
         break;
       case 'restock':
-        this.popup(`+${this.cfg.restockBatch} potions`, '#39A68D', 370);
+        this.popup(`+${batchAt(this.cfg, event.cratesLevel)} potions`, '#39A68D', 370);
         break;
       case 'upgrade':
         this.popup(`Better Brews Lv ${event.upgradeLevel}`, '#E8B85B', 370);
+        break;
+      case 'crates_upgrade':
+        this.popup(`Bigger Crates Lv ${event.cratesLevel}`, '#F3E6C9', 370);
         break;
       case 'session_end':
         this.popup('Shop closed', '#F3E6C9', 370);

@@ -1,6 +1,17 @@
 import type { EconomyConfig } from '../config/types';
-import { batchAt, priceAt, sessionMs, upgradeCostAt, upgradeSafeAt, type SessionSummary } from '../economy/economy';
+import {
+  batchAt,
+  cratesCostAt,
+  cratesSafeAt,
+  priceAt,
+  rushStatus,
+  sessionMs,
+  upgradeCostAt,
+  upgradeSafeAt,
+  type SessionSummary,
+} from '../economy/economy';
 import type { Availability, BlockReason, EconomyState } from '../economy/types';
+import type { Best } from '../storage/save';
 
 // DOM overlay (plan decision B): HUD, action buttons, reason text, pause menu, title and summary.
 // Elements live in index.html; this module only fills them in and wires click handlers.
@@ -20,6 +31,8 @@ const formatClock = (ms: number) => {
   const total = Math.ceil(Math.max(0, ms) / 1000);
   return `${Math.floor(total / 60)}:${String(total % 60).padStart(2, '0')}`;
 };
+
+const signed = (coins: number) => `${coins < 0 ? '−' : '+'}${Math.abs(coins)}c`;
 
 // `value` is the action's cost for need_coins, the guard's unlock amount for dead_shop_guard,
 // the current crate size for need_slots and whole seconds left for cooldown.
@@ -52,6 +65,7 @@ function showOnly(panelId: string | null) {
 export function showTitle(opts: {
   configId: string;
   notice: string | null;
+  best: Best | null;
   onContinue: (() => void) | null;
   onLastSummary: (() => void) | null;
   onNewDay: () => void;
@@ -59,6 +73,8 @@ export function showTitle(opts: {
   showOnly('title-panel');
   el('pause-btn').hidden = true;
   setText(el('title-config'), `Config: ${opts.configId}`);
+  el('title-best').hidden = !opts.best;
+  setText(el('title-best'), opts.best ? `Best profit ${signed(opts.best.profit)}` : '');
   el('title-notice').hidden = !opts.notice;
   setText(el('title-notice'), opts.notice ?? '');
   for (const [id, handler] of [
@@ -89,12 +105,26 @@ export function setSaveStatus(saved: boolean | null) {
   node.classList.toggle('failed', saved === false);
 }
 
-export function showPlay(handlers: { onRestock: () => void; onUpgrade: () => void; onPause: () => void }) {
+export function showPlay(handlers: {
+  onRestock: () => void;
+  onUpgrade: () => void;
+  onCrates: () => void;
+  onPause: () => void;
+}) {
   showOnly(null);
   el('pause-btn').hidden = false;
   el('restock-btn').onclick = handlers.onRestock;
   el('upgrade-btn').onclick = handlers.onUpgrade;
+  el('crates-btn').onclick = handlers.onCrates;
   el('pause-btn').onclick = handlers.onPause;
+}
+
+// Rush countdown beside the timer (Session 6): predictable only if the player can see it coming.
+function renderRush(cfg: EconomyConfig, tMs: number) {
+  const status = rushStatus(cfg, tMs);
+  const node = el('rush');
+  node.classList.toggle('active', !!status?.active);
+  setText(node, !status ? '' : status.active ? `RUSH! ${formatClock(status.msLeft)}` : `Rush in ${formatClock(status.msLeft)}`);
 }
 
 export function renderPlay(
@@ -102,20 +132,32 @@ export function renderPlay(
   cfg: EconomyConfig,
   restock: Availability,
   upgrade: Availability,
+  crates: Availability,
 ) {
   const cost = upgradeCostAt(cfg, state.upgradeLevel);
   setText(el('coins'), `${state.coins}c`);
   setText(el('stock'), `${state.stock}/${cfg.shelfCap}`);
   setText(el('timer'), formatClock(sessionMs(cfg) - state.elapsedMs));
+  renderRush(cfg, state.elapsedMs);
   setText(el('upgrade-level'), `Lv ${state.upgradeLevel}`);
-  setText(
-    el('upgrade-info'),
-    `Price ${priceAt(cfg, state.upgradeLevel)}c → ${priceAt(cfg, state.upgradeLevel + 1)}c · cost ${cost}c`,
-  );
+  setText(el('upgrade-info'), `Price ${priceAt(cfg, state.upgradeLevel)}c → ${priceAt(cfg, state.upgradeLevel + 1)}c`);
   const batch = batchAt(cfg, state.cratesLevel);
+  const maxed = state.cratesLevel >= cfg.cratesMaxLevel;
+  const cratesCost = cratesCostAt(cfg, state.cratesLevel);
+  setText(el('crates-level'), `Lv ${state.cratesLevel}`);
+  setText(el('crates-info'), maxed ? `Crate ${batch} (max)` : `Crate ${batch} → ${batchAt(cfg, state.cratesLevel + 1)}`);
   setText(el('restock-label'), `Restock +${batch}`);
   setText(el('restock-cost'), `${cfg.restockCost}c`);
   setText(el('upgrade-cost'), `${cost}c`);
+  setText(el('crates-cost'), maxed ? '—' : `${cratesCost}c`);
+  setAction(
+    el<HTMLButtonElement>('crates-btn'),
+    el('crates-reason'),
+    crates,
+    crates.ok
+      ? ''
+      : reasonText(crates.reason, crates.reason === 'dead_shop_guard' ? cratesSafeAt(state, cfg) : cratesCost),
+  );
   const restockValue: Record<string, number> = {
     need_coins: cfg.restockCost,
     need_slots: batch,
@@ -159,15 +201,27 @@ export function hidePause() {
   showOnly(null);
 }
 
-export function showSummary(summary: SessionSummary, handlers: { onExport: () => void; onNewDay: () => void }) {
+// End-of-day summary (Session 6): profit is the headline score, compared with the personal best.
+export function showSummary(
+  summary: SessionSummary,
+  best: { best: Best; isNew: boolean },
+  handlers: { onExport: () => void; onNewDay: () => void },
+) {
   showOnly('summary-panel');
   el('pause-btn').hidden = true;
+  setText(el('sum-profit'), signed(summary.profit));
+  setText(el('sum-best'), best.isNew ? 'New best!' : `Best ${signed(best.best.profit)}`);
+  el('sum-best').classList.toggle('new', best.isNew);
+  const spend = (coins: number) => (coins ? `−${coins}c` : '0c');
   setText(el('sum-revenue'), `${summary.revenue}c`);
-  setText(el('sum-restock'), `−${summary.restockSpend}c`);
-  setText(el('sum-upgrade'), `−${summary.upgradeSpend}c`);
+  setText(el('sum-restock'), spend(summary.restockSpend));
+  setText(el('sum-brews'), spend(summary.brewsSpend));
+  setText(el('sum-crates'), spend(summary.cratesSpend));
+  setText(el('sum-level'), `Lv ${summary.upgradeLevel}`);
+  setText(el('sum-crates-level'), `Lv ${summary.cratesLevel}`);
   setText(el('sum-sold'), `${summary.sold}`);
   setText(el('sum-missed'), `${summary.missed}`);
-  setText(el('sum-level'), `${summary.upgradeLevel}`);
+  setText(el('sum-rushes'), summary.rushes.map((r) => `${r.served}/${r.served + r.missed}`).join('  ') || '—');
   setText(el('sum-closing'), `${summary.closing}c`);
   el('summary-export-btn').onclick = handlers.onExport;
   el('summary-new-day-btn').onclick = handlers.onNewDay;

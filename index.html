@@ -21,14 +21,21 @@
           <button id="pause-btn" class="icon-btn" type="button" aria-label="Pause">II</button>
         </div>
         <div id="timer" class="timer" aria-label="Time left">5:00</div>
+        <div id="rush" class="rush"></div>
       </header>
 
       <div id="scene"></div>
 
       <section id="controls">
         <div class="upgrade-card">
-          <div class="upgrade-head"><span>Better Brews</span><span id="upgrade-level">Lv 0</span></div>
-          <div id="upgrade-info" class="upgrade-info">Price 5c → 7c · cost 50c</div>
+          <div class="upgrade-row">
+            <span class="upgrade-head">Better Brews <span id="upgrade-level">Lv 0</span></span>
+            <span id="upgrade-info" class="upgrade-info">Price 5c → 7c</span>
+          </div>
+          <div class="upgrade-row">
+            <span class="upgrade-head">Bigger Crates <span id="crates-level">Lv 0</span></span>
+            <span id="crates-info" class="upgrade-info">Crate 5 → 8</span>
+          </div>
         </div>
         <div class="actions">
           <div class="action">
@@ -40,10 +47,17 @@
           </div>
           <div class="action">
             <button id="upgrade-btn" class="action-btn upgrade" type="button">
-              <span class="action-label">Upgrade</span>
+              <span class="action-label">Brews</span>
               <span id="upgrade-cost" class="action-cost">50c</span>
             </button>
             <div id="upgrade-reason" class="reason" aria-live="polite"></div>
+          </div>
+          <div class="action">
+            <button id="crates-btn" class="action-btn crates" type="button">
+              <span class="action-label">Crates</span>
+              <span id="crates-cost" class="action-cost">40c</span>
+            </button>
+            <div id="crates-reason" class="reason" aria-live="polite"></div>
           </div>
         </div>
         <div id="save-status" class="save-status" aria-live="polite"></div>
@@ -52,7 +66,8 @@
       <section id="title-panel" class="panel" hidden>
         <div class="panel-body">
           <h1 class="game-title">Dungeon Counter</h1>
-          <p class="tagline">Run the potion stall at the mouth of the dungeon for one five-minute day.</p>
+          <p class="tagline">Run the potion stall at the mouth of the dungeon for one five-minute day. Stock up before the rushes and beat your best profit.</p>
+          <p id="title-best" class="best" hidden></p>
           <p id="title-notice" class="notice" role="status" hidden></p>
           <div class="stack">
             <button id="continue-btn" class="panel-btn primary" type="button" hidden>Continue</button>
@@ -93,14 +108,16 @@
       <section id="summary-panel" class="panel" hidden>
         <div class="panel-body card">
           <h2>Shop closed</h2>
+          <div class="profit"><span class="profit-label">Profit</span><span id="sum-profit" class="profit-value"></span></div>
+          <p id="sum-best" class="best"></p>
           <table class="summary-table">
             <tbody>
               <tr><th>Sales revenue</th><td id="sum-revenue"></td></tr>
-              <tr><th>Restock spending</th><td id="sum-restock"></td></tr>
-              <tr><th>Upgrade spending</th><td id="sum-upgrade"></td></tr>
-              <tr><th>Potions sold</th><td id="sum-sold"></td></tr>
-              <tr><th>Missed sales</th><td id="sum-missed"></td></tr>
-              <tr><th>Better Brews level</th><td id="sum-level"></td></tr>
+              <tr><th>Restocks</th><td id="sum-restock"></td></tr>
+              <tr><th>Better Brews <span id="sum-level"></span></th><td id="sum-brews"></td></tr>
+              <tr><th>Bigger Crates <span id="sum-crates-level"></span></th><td id="sum-crates"></td></tr>
+              <tr><th>Sold / missed</th><td><span id="sum-sold"></span> / <span id="sum-missed"></span></td></tr>
+              <tr><th>Rushes served</th><td id="sum-rushes"></td></tr>
               <tr class="total"><th>Closing balance</th><td id="sum-closing"></td></tr>
             </tbody>
           </table>

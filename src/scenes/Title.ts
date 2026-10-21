@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import type { EconomyConfig } from '../config/types';
-import { browserStorage, readSave, runFromSave } from '../storage/save';
+import { browserStorage, readBest, readSave, runFromSave } from '../storage/save';
 import * as overlay from '../ui/overlay';
 
 // Thin scene: the title panel is DOM (overlay); this reads the config's save and routes.
@@ -22,6 +22,7 @@ export class TitleScene extends Phaser.Scene {
     overlay.showTitle({
       configId: cfg.id,
       notice: [configNotice, saveNotice].filter(Boolean).join(' ') || null,
+      best: readBest(browserStorage(), cfg.id),
       onContinue: unfinished ? () => this.scene.start('Play', { resume: unfinished }) : null,
       onLastSummary: finished ? () => this.scene.start('Summary', { run: runFromSave(finished) }) : null,
       // A new day replaces the saved log, so confirm whenever one exists (GDD §3, §8).
