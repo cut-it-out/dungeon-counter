@@ -138,7 +138,7 @@ I add nothing special; Vite's `dist/` is static. In the Cloudflare dashboard: Wo
 **S12. Baseline evidence runs.** P1 **[you]**
 ≥ 1, target 2, complete played sessions on `?config=baseline`, following the §6 policy (restock at stock 1 if affordable; upgrade as soon as allowed; otherwise wait). Export each CSV into `balancing/runs/`. Note deviations in `balancing/notes.md`.
 ✔ Files in `balancing/runs/` whose `run_id`s differ and whose last row is `session_end`.
-*(Session 7: `?config=baseline` now plays `challenge-v1`, and the runs are free play (GDD v4 §6). The two idle-loop runs already in `balancing/runs/` stay as the before-evidence.)*
+*(Session 7: `?config=baseline` now plays `challenge-v1`, and the runs are free play (GDD v4 §6). The two idle-loop runs are the before-evidence, moved to `balancing/obsolete/idle-loop-runs/` in Session 8 so the SQL skips them.)*
 
 **S13. SQL aggregation.** P1 (decision A)
 `balancing/summary.sql`: one query over `read_csv_auto('balancing/runs/*.csv')`, grouped by `run_id, config_id, run_type`: first-upgrade time, idle time (`LEAD(elapsed_s)` × availability `CASE` from row state and config constants), longest idle stretch, action spacing, upgrade spacing, revenue in minute 2 vs 5, time-weighted surplus, missed sales, revenue, restock spend, upgrade spend, closing balance, reconciliation check. `balancing/run_sql.py` + `README` line: `uv run --with duckdb balancing/run_sql.py`.

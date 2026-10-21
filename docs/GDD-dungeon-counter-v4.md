@@ -172,7 +172,7 @@ Events: `session_start`, `sale`, `missed_sale`, `restock`, `upgrade` (Better Bre
 
 ## 10. Balancing and evidence plan
 
-1. **Preserve provenance.** `challenge-v1` committed before any played run on it; the idle loop kept as tag `idle-loop-v1` with run-7355 and run-2ccd as the before-evidence.
+1. **Preserve provenance.** `challenge-v1` committed before any played run on it; the idle loop kept as tag `idle-loop-v1` with run-7355 and run-2ccd as the before-evidence, marked obsolete in `balancing/obsolete/idle-loop-runs/` so the SQL over `balancing/runs/` skips them (Session 8).
 2. **Play `challenge-v1`.** At least one, target two, complete free-play sessions; export into `balancing/runs/`.
 3. **Inspect.** One SQL script (DuckDB) over all runs: v3's metrics plus rush service, last-upgrade time and profit; the idle split at the cooldown (§6).
 4. **Create `challenge-v2`** from what the played data and the dominance check show, one headline change or one tightly justified set; old/new values and the hypothesis in `balancing/notes.md`. The strategy report runs on it automatically.

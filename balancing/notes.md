@@ -6,8 +6,8 @@ Played runs, deviations and config changes, newest last. Numbers come from the C
 
 | run_id | config | date | notes |
 |---|---|---|---|
-| run-7355 | baseline-v1 (idle loop) | 21 Oct 2026 | Fixed policy. 100 sold / 0 missed, 20 restocks, Brews 5, closing 202c. Before-evidence for the pivot. |
-| run-2ccd | baseline-v1 (idle loop) | 21 Oct 2026 | Fixed policy. 100 sold / 0 missed, 20 restocks, Brews 5, closing 240c. Before-evidence for the pivot. |
+| run-7355 | baseline-v1 (idle loop, **obsolete**) | 21 Oct 2026 | In `obsolete/idle-loop-runs/`, outside the SQL. Fixed policy. 100 sold / 0 missed, 20 restocks, Brews 5, closing 202c. Before-evidence for the pivot. |
+| run-2ccd | baseline-v1 (idle loop, **obsolete**) | 21 Oct 2026 | In `obsolete/idle-loop-runs/`, outside the SQL. Fixed policy. 100 sold / 0 missed, 20 restocks, Brews 5, closing 240c. Before-evidence for the pivot. |
 | run-849f | challenge-v1 | 21 Oct 2026 | Free play. 156 sold / 2 missed, 15 restocks, Brews 6, Crates 3, closing 404c (profit +384c). |
 
 ## challenge-v2 (Session 8)

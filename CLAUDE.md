@@ -39,5 +39,5 @@ src/scenes/           Phaser scenes (shop scene only; DOM overlay owns the UI)
 src/ui/overlay.ts     HUD, buttons, reason text, pause menu, summary, save status
 public/assets/        confirmed CC0 sprites (credited in CREDITS.md)
 tests/                Vitest
-balancing/            played CSVs, configs/baseline-v1.json (frozen idle-loop config, tag idle-loop-v1), summary.sql, run_sql.py (`uv run --with duckdb balancing/run_sql.py`), notes
+balancing/            played CSVs (runs/; only these feed the SQL), obsolete/idle-loop-runs/ and configs/baseline-v1.json (idle loop, tag idle-loop-v1, not current evidence), summary.sql, run_sql.py (`uv run --with duckdb balancing/run_sql.py`), notes
 ```
