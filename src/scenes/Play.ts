@@ -3,6 +3,7 @@ import type { EconomyConfig } from '../config/types';
 import { advanceTo, canRestock, canUpgrade, createState, restock, summarize, upgrade } from '../economy/economy';
 import type { EconomyState } from '../economy/types';
 import { markerEvent, newRun, type LogEvent, type RunLog } from '../log/eventLog';
+import { browserStorage, clearSave, runFromSave, stateFromSave, toSave, writeSave, type SaveData } from '../storage/save';
 import * as overlay from '../ui/overlay';
 
 // Shop scene size in design px. The canvas fills only the middle box of the page's flex
@@ -44,11 +45,13 @@ export class PlayScene extends Phaser.Scene {
     super('Play');
   }
 
-  create() {
+  // data.resume: an unfinished save from the title's Continue; otherwise a new day.
+  create(data: { resume?: SaveData }) {
+    const resume = data.resume;
     this.cfg = this.registry.get('config') as EconomyConfig;
-    this.state = createState(this.cfg);
-    this.run = newRun(this.cfg);
-    this.clockMs = 0;
+    this.state = resume ? stateFromSave(resume) : createState(this.cfg);
+    this.run = resume ? runFromSave(resume) : newRun(this.cfg);
+    this.clockMs = this.state.elapsedMs;
     this.paused = false;
     this.ending = false;
     this.shownStock = -1;
@@ -61,11 +64,14 @@ export class PlayScene extends Phaser.Scene {
       onUpgrade: () => this.record(upgrade(this.state, this.cfg)),
       onPause: () => this.pause(),
     });
+    overlay.setSaveStatus(null);
     document.addEventListener('visibilitychange', this.onVisibilityChange);
+    window.addEventListener('pagehide', this.save);
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
       document.removeEventListener('visibilitychange', this.onVisibilityChange);
+      window.removeEventListener('pagehide', this.save);
     });
-    this.record(markerEvent(this.state, this.cfg, 'session_start'));
+    this.record(markerEvent(this.state, this.cfg, resume ? 'resume' : 'session_start'));
   }
 
   update(_time: number, delta: number) {
@@ -78,29 +84,41 @@ export class PlayScene extends Phaser.Scene {
       this.ending = true;
       const summary = summarize(this.cfg, this.run.events);
       if (import.meta.env.DEV) console.table(summary);
-      this.time.delayedCall(800, () => this.scene.start('Summary', { summary }));
+      this.time.delayedCall(800, () => this.scene.start('Summary', { run: this.run }));
     }
   }
 
   private onVisibilityChange = () => {
-    if (document.hidden) this.pause();
+    if (!document.hidden) return;
+    this.pause();
+    this.save();
+  };
+
+  // Synchronous, best-effort: after every event, on pause, on hide and on pagehide (GDD §8).
+  private save = () => {
+    overlay.setSaveStatus(writeSave(browserStorage(), toSave(this.state, this.run)));
   };
 
   private pause() {
     if (this.paused || this.ending) return;
     this.paused = true;
+    this.save();
     overlay.showPause(this.cfg.id, {
       onResume: () => {
         this.paused = false;
         overlay.hidePause();
       },
-      onReset: () => this.scene.start('Title'),
+      onReset: () => {
+        clearSave(browserStorage(), this.cfg.id);
+        this.scene.start('Title');
+      },
     });
   }
 
   private record(event: LogEvent | null) {
     if (!event) return;
     this.run.events.push(event);
+    this.save();
     if (import.meta.env.DEV) {
       const e = event;
       console.log(

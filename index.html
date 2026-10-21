@@ -46,13 +46,30 @@
             <div id="upgrade-reason" class="reason" aria-live="polite"></div>
           </div>
         </div>
+        <div id="save-status" class="save-status" aria-live="polite"></div>
       </section>
 
       <section id="title-panel" class="panel" hidden>
         <div class="panel-body">
           <h1 class="game-title">Dungeon Counter</h1>
           <p class="tagline">Run the potion stall at the mouth of the dungeon for one five-minute day.</p>
-          <button id="new-day-btn" class="panel-btn primary" type="button">New day</button>
+          <p id="title-notice" class="notice" role="status" hidden></p>
+          <div class="stack">
+            <button id="continue-btn" class="panel-btn primary" type="button" hidden>Continue</button>
+            <button id="last-summary-btn" class="panel-btn primary" type="button" hidden>Last summary / Export</button>
+            <button id="new-day-btn" class="panel-btn primary" type="button">New day</button>
+          </div>
+          <p id="title-config" class="muted"></p>
+        </div>
+      </section>
+
+      <section id="confirm-panel" class="panel" hidden>
+        <div class="panel-body card">
+          <p id="confirm-text"></p>
+          <div class="stack">
+            <button id="confirm-no-btn" class="panel-btn primary" type="button">Back</button>
+            <button id="confirm-yes-btn" class="panel-btn danger" type="button"></button>
+          </div>
         </div>
       </section>
 

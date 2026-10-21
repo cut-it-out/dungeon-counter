@@ -1,14 +1,29 @@
 import Phaser from 'phaser';
-import type { SessionSummary } from '../economy/economy';
+import type { EconomyConfig } from '../config/types';
+import { summarize } from '../economy/economy';
+import type { RunLog } from '../log/eventLog';
 import * as overlay from '../ui/overlay';
 
-// Thin scene: the summary panel is DOM (overlay); this only routes to the next day.
+// Thin scene: the summary panel is DOM (overlay); this derives the numbers from the run's
+// log and routes to the next day.
 export class SummaryScene extends Phaser.Scene {
   constructor() {
     super('Summary');
   }
 
-  create(data: { summary: SessionSummary }) {
-    overlay.showSummary(data.summary, () => this.scene.start('Play'));
+  create(data: { run: RunLog }) {
+    const cfg = this.registry.get('config') as EconomyConfig;
+    const show = () =>
+      overlay.showSummary(summarize(cfg, data.run.events), {
+        // The finished log stays saved until replaced (GDD §8), so New day confirms.
+        onNewDay: () =>
+          overlay.confirm(
+            'Start a new day? This day’s log will be replaced. Export it first to keep it.',
+            'New day',
+            () => this.scene.start('Play', {}), // explicit {}: Phaser would reuse a stale resume
+            show,
+          ),
+      });
+    show();
   }
 }

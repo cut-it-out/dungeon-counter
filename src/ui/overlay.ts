@@ -39,13 +39,49 @@ function setAction(button: HTMLButtonElement, reasonNode: HTMLElement, avail: Av
 }
 
 function showOnly(panelId: string | null) {
-  for (const id of ['title-panel', 'pause-panel', 'summary-panel']) el(id).hidden = id !== panelId;
+  for (const id of ['title-panel', 'pause-panel', 'confirm-panel', 'summary-panel']) el(id).hidden = id !== panelId;
 }
 
-export function showTitle(onNewDay: () => void) {
+// Title (GDD §3): Continue for an unfinished save, Last summary / Export for a finished one.
+// A null handler hides its button.
+export function showTitle(opts: {
+  configId: string;
+  notice: string | null;
+  onContinue: (() => void) | null;
+  onLastSummary: (() => void) | null;
+  onNewDay: () => void;
+}) {
   showOnly('title-panel');
   el('pause-btn').hidden = true;
-  el('new-day-btn').onclick = onNewDay;
+  setText(el('title-config'), `Config: ${opts.configId}`);
+  el('title-notice').hidden = !opts.notice;
+  setText(el('title-notice'), opts.notice ?? '');
+  for (const [id, handler] of [
+    ['continue-btn', opts.onContinue],
+    ['last-summary-btn', opts.onLastSummary],
+  ] as const) {
+    el(id).hidden = !handler;
+    el(id).onclick = handler;
+  }
+  // New day is the primary button only when there is nothing to continue or review.
+  el('new-day-btn').classList.toggle('primary', !opts.onContinue && !opts.onLastSummary);
+  el('new-day-btn').onclick = opts.onNewDay;
+}
+
+// Confirm before a destructive action; "Back" is the safe, primary choice.
+export function confirm(text: string, yesLabel: string, onYes: () => void, onNo: () => void) {
+  showOnly('confirm-panel');
+  setText(el('confirm-text'), text);
+  setText(el('confirm-yes-btn'), yesLabel);
+  el('confirm-yes-btn').onclick = onYes;
+  el('confirm-no-btn').onclick = onNo;
+}
+
+// Driven by the actual write result; never claims "Saved" after a failed write (GDD §8).
+export function setSaveStatus(saved: boolean | null) {
+  const node = el('save-status');
+  setText(node, saved === null ? '' : saved ? '✓ Saved' : 'Not saved');
+  node.classList.toggle('failed', saved === false);
 }
 
 export function showPlay(handlers: { onRestock: () => void; onUpgrade: () => void; onPause: () => void }) {
@@ -108,7 +144,7 @@ export function hidePause() {
   showOnly(null);
 }
 
-export function showSummary(summary: SessionSummary, onNewDay: () => void) {
+export function showSummary(summary: SessionSummary, handlers: { onNewDay: () => void }) {
   showOnly('summary-panel');
   el('pause-btn').hidden = true;
   setText(el('sum-revenue'), `${summary.revenue}c`);
@@ -118,5 +154,5 @@ export function showSummary(summary: SessionSummary, onNewDay: () => void) {
   setText(el('sum-missed'), `${summary.missed}`);
   setText(el('sum-level'), `${summary.upgradeLevel}`);
   setText(el('sum-closing'), `${summary.closing}c`);
-  el('summary-new-day-btn').onclick = onNewDay;
+  el('summary-new-day-btn').onclick = handlers.onNewDay;
 }

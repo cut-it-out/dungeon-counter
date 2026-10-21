@@ -210,7 +210,21 @@ button {
   text-align: center;
 }
 
-/* Full-screen modal panels: title, pause, summary. */
+.save-status {
+  min-height: 18px;
+  margin-top: 2px;
+  font-size: 13px;
+  text-align: right;
+  opacity: 0.8;
+}
+
+.save-status.failed {
+  color: var(--gold);
+  font-weight: 700;
+  opacity: 1;
+}
+
+/* Full-screen modal panels: title, pause, confirm, summary. */
 .panel {
   position: absolute;
   inset: 0;
@@ -292,6 +306,23 @@ button {
 
 #title-panel .panel-btn {
   border-color: var(--parchment);
+}
+
+#title-panel .panel-btn.primary {
+  border-color: var(--gold);
+}
+
+.notice {
+  margin: 0 0 16px;
+  padding: 10px 12px;
+  border: 2px solid var(--copper);
+  border-radius: 10px;
+  line-height: 1.4;
+}
+
+.notice[hidden],
+.panel-btn[hidden] {
+  display: none;
 }
 
 .summary-table {
