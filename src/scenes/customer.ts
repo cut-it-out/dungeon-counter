@@ -18,7 +18,7 @@ export interface CustomerPose {
 
 const WALK_MS = 900;
 const SERVE_MS = 600;
-const POP = 0.15; // peak scale-up at the purchase
+const POP = 0.18; // peak scale-up at the purchase
 const STEPS = 4; // step bobs per walk
 const STEP_LIFT = 3;
 

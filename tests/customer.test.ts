@@ -24,7 +24,7 @@ describe('customer pose', () => {
 
   it('scales up and back down at the counter for a sale', () => {
     expect(pose(3000, 3000).scale).toBe(1);
-    expect(pose(3300, 3000).scale).toBeCloseTo(1.15);
+    expect(pose(3300, 3000).scale).toBeCloseTo(1.18); // POP, my tuning in Session 9
     expect(pose(3599, 3000).scale).toBeLessThan(1.01);
   });
 

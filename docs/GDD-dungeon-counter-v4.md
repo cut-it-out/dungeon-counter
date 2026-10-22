@@ -87,7 +87,7 @@ Title ── New day ──► Play (5:00) ──► Summary ──► New day
 
 ### Config files
 
-`src/config/challenge-v1.json` (frozen baseline) and, after evidence, `challenge-v2.json` (revision). `?config=baseline` plays `challenge-v1`, `?config=revised` plays `challenge-v2`; the public default stays `challenge-v1` until the revision is accepted. The v3 idle config is kept unchanged in `balancing/configs/baseline-v1.json` as the reference for its CSVs, and the playable idle build is the git tag `idle-loop-v1`.
+`src/config/challenge-v1.json` (frozen baseline) and the revisions `challenge-v2.json` and `challenge-v3.json`. `?config=baseline` plays `challenge-v1`; `?config=revised` plays the newest revision (`challenge-v3`); any full id also works (`?config=challenge-v2`). Since Session 9 the public default (no `?config=`) is the revised config, by the developer's direction and before played runs on it. The v3 idle config is kept unchanged in `balancing/configs/baseline-v1.json` as the reference for its CSVs, and the playable idle build is the git tag `idle-loop-v1`.
 
 ### Frozen AI-proposed baseline: `challenge-v1`
 
@@ -110,7 +110,11 @@ Proposed by Claude Code in Session 6 without simulation, accepted by the develop
 
 ### Revision: `challenge-v2` (Session 8)
 
-`challenge-v1` plus **`calmSpeedup` 0.85**, nothing else: calm stretches every 4 s → 3.4 s → 2.89 s → 2.456 s, giving 69 calm + 103 rush = **172** arrivals, the last at 299.472 s. Reason: the developer's play of `challenge-v1` found the calm stretches between rushes slow. Hypothesis, old/new values and evidence in `balancing/notes.md`. `?config=revised` plays it; the public default stays `challenge-v1` until it is accepted.
+`challenge-v1` plus **`calmSpeedup` 0.85**, nothing else: calm stretches every 4 s → 3.4 s → 2.89 s → 2.456 s, giving 69 calm + 103 rush = **172** arrivals, the last at 299.472 s. Reason: the developer's play of `challenge-v1` found the calm stretches between rushes slow. Hypothesis, old/new values and evidence in `balancing/notes.md`. Playable as `?config=challenge-v2` since Session 9.
+
+### Revision: `challenge-v3` (Session 9, made by the developer)
+
+`challenge-v2` with `calmSpeedup` **0.7** (calm 4 s → 2.8 s → 1.96 s → 1.372 s) and slower rushes, **1.2 / 0.8 / 0.65 s**, so the calm and rush speeds are closer: 94 calm + 93 rush = **187** arrivals. Reason: the calm stretches still felt slow on v2, and the developer hoped closer speeds make the normal pace feel better. It is the public default (`?config=revised` and no parameter). Headless strategies serve every rush customer on it, and Better Brews dominates by more than on v1/v2 (`balancing/notes.md`).
 
 ## 6. Telemetry and balancing questions
 
