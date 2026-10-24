@@ -41,6 +41,12 @@ export function validateConfig(cfg: EconomyConfig): EconomyConfig {
   if (maxBatch > cfg.shelfCap) {
     errors.push(`restockBatch + cratesBatchStep * cratesMaxLevel (${maxBatch}) must be <= shelfCap (${cfg.shelfCap})`);
   }
+  if (cfg.medals !== undefined) {
+    const { bronze, silver, gold } = cfg.medals;
+    if (![bronze, silver, gold].every(isPosInt) || !(bronze < silver && silver < gold)) {
+      errors.push(`medals must be positive integers with bronze < silver < gold (got ${bronze} / ${silver} / ${gold})`);
+    }
+  }
   if (!Array.isArray(cfg.rushes)) {
     errors.push('rushes must be an array');
   } else {

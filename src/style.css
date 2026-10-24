@@ -5,6 +5,7 @@
   --jade: #39a68d;
   --parchment: #f3e6c9;
   --copper: #b85c42;
+  --silver: #c9cdd6; /* medal only; not in the brand palette */
 }
 
 * {
@@ -431,4 +432,46 @@ button {
   margin: -12px 0 24px;
   text-align: center;
   color: var(--gold);
+}
+
+/* Summary medal (Session 11): a pill in the medal's color, then the next threshold. */
+.medal-row {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 8px;
+  margin: 4px 0 0;
+}
+
+.medal-row[hidden],
+.medal[hidden] {
+  display: none;
+}
+
+.medal {
+  padding: 2px 10px;
+  border-radius: 999px;
+  border: 2px solid var(--ink);
+  font-weight: 800;
+  font-size: 15px;
+}
+
+.medal-gold {
+  background: var(--gold);
+  color: var(--ink);
+}
+
+.medal-silver {
+  background: var(--silver);
+  color: var(--ink);
+}
+
+.medal-bronze {
+  background: var(--copper);
+  color: var(--parchment);
+}
+
+.medal-next {
+  font-size: 14px;
+  opacity: 0.75;
 }

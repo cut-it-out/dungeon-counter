@@ -30,4 +30,6 @@ export interface EconomyConfig {
   cratesCostGrowth: number;
   cratesBatchStep: number;
   cratesMaxLevel: number;
+  // Profit thresholds for the summary medal (Session 11), set from played runs. Absent = no medal.
+  medals?: { bronze: number; silver: number; gold: number };
 }

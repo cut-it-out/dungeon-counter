@@ -131,6 +131,8 @@ The idle loop was judged solved after a few rounds (build log Session 6), so the
 
 *Status after Session 10:* S10 ✔ (my phone, Session 9) · S13 ✔ `balancing/summary.sql` + `run_sql.py` · S14 ✔ as `challenge-v4` (v2, v3 were my earlier revisions) · S16 ✔ `balancing/balancing-table.md` · from S18, pulled forward: the simulator (`npm run simulate`, CSVs in `balancing/simulated/`) and a dashboard instead of a static chart. Left: S15 played runs on v4, then a refresh of S16; S17 docs; medals.
 
+*Session 11:* S15 on v4 ✔ (two runs) and S16 refreshed; at my request one more revision, `challenge-v5` (faster rushes 2–3 so the Crates choice shows), and medals built as per-config thresholds instead of dropped. Left: S15 runs on v5 and a last S16 refresh; S17 docs.
+
 ### Day 3 — tuning & portfolio (~8 h)
 
 **S11. Deploy to Cloudflare Pages.** P1 **[you]** for the dashboard part

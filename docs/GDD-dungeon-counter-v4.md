@@ -87,7 +87,7 @@ Title ── New day ──► Play (5:00) ──► Summary ──► New day
 
 ### Config files
 
-`src/config/challenge-v1.json` (frozen baseline) and the revisions `challenge-v2.json`, `challenge-v3.json` and `challenge-v4.json`. `?config=baseline` plays `challenge-v1`; `?config=revised` plays the newest revision (`challenge-v4`); any full id also works (`?config=challenge-v2`). Since Session 9 the public default (no `?config=`) is the revised config, by the developer's direction and before played runs on it. The v3 idle config is kept unchanged in `balancing/configs/baseline-v1.json` as the reference for its CSVs, and the playable idle build is the git tag `idle-loop-v1`.
+`src/config/challenge-v1.json` (frozen baseline) and the revisions `challenge-v2.json` to `challenge-v5.json`. `?config=baseline` plays `challenge-v1`; `?config=revised` plays the newest revision (`challenge-v5`); any full id also works (`?config=challenge-v2`). Since Session 9 the public default (no `?config=`) is the revised config, by the developer's direction and before played runs on it. The v3 idle config is kept unchanged in `balancing/configs/baseline-v1.json` as the reference for its CSVs, and the playable idle build is the git tag `idle-loop-v1`.
 
 ### Frozen AI-proposed baseline: `challenge-v1`
 
@@ -119,6 +119,10 @@ Proposed by Claude Code in Session 6 without simulation, accepted by the develop
 ### Revision: `challenge-v4` (Session 10)
 
 `challenge-v3` with the developer's tunes `calmSpeedup` **0.67** and a **0.6 s** last rush (198 arrivals). In the headless check these alone end the Better Brews dominance: brews-only 1118c and crates-first 1119c tie, and mixing both upgrades (cheaper-first) makes 1210c. No Crates or Brews number changed; each candidate tested would have tipped the balance toward Crates or halved profits (`balancing/notes.md`). It is the newest revision, so `?config=revised` and the default play it.
+
+### Revision: `challenge-v5` (Session 11)
+
+`challenge-v4` with rush 2 at **0.7 s**, the last rush at **0.5 s** (212 arrivals) and medal thresholds 700 / 850 / 1000c. Played v4 runs never tested the upgrade choice and the model's v4 mix advantage (92c) was below the developer's run-to-run spread; on v5 pure Brews (1199c, last rush 47/60) and pure Crates (1210c) are level and the mix makes 1410c. It is the newest revision, so `?config=revised` and the default play it.
 
 ## 6. Telemetry and balancing questions
 
@@ -213,7 +217,7 @@ Events: `session_start`, `sale`, `missed_sale`, `restock`, `upgrade` (Better Bre
 3. **Bigger Crates effect:** a bigger crate at the same cost, so more potions per cooldown. Margin (Brews) vs volume (Crates). Same session.
 4. **Baseline handling:** a new frozen baseline for the new rules; the idle loop is preserved, not config-gated. Same session.
 5. **Evidence protocol:** free play plus scripted headless strategies. Same session.
-6. **Medals:** still P2; the personal best carries the replay motivation.
+6. **Medals:** built in Session 11 at the developer's request, as optional per-config profit thresholds (`medals` in the config, set from played runs; `challenge-v5`: bronze 700c, silver 850c, gold 1000c). The summary shows the medal and the next threshold; configs without thresholds show none.
 7. **What a good five-minute run looks like:** still an assumption to measure: some missed sales in the late rushes for a typical player, a real Brews/Crates split among good runs, and a profit that improves with practice.
 
 ## 13–15. Earlier change logs

@@ -7,6 +7,8 @@ import {
   arrivalTimes,
   batchAt,
   calmIntervalMs,
+  medalFor,
+  nextMedal,
   canRestock,
   canUpgrade,
   canUpgradeCrates,
@@ -347,5 +349,27 @@ describe('calm speed-up (challenge-v2)', () => {
 
   it('leaves a config without calmSpeedup at a constant calm interval', () => {
     expect([0, 1, 2, 3].map((i) => calmIntervalMs(ch, i))).toEqual([4_000, 4_000, 4_000, 4_000]);
+  });
+});
+
+describe('medals (Session 11)', () => {
+  const withMedals: EconomyConfig = { ...ch, medals: { bronze: 700, silver: 850, gold: 1000 } };
+
+  it('gives the highest medal whose threshold the profit reaches', () => {
+    expect([699, 700, 849, 850, 999, 1000, 1500].map((p) => medalFor(withMedals, p))).toEqual([
+      null, 'bronze', 'bronze', 'silver', 'silver', 'gold', 'gold',
+    ]);
+  });
+
+  it('names the next medal and its threshold, none at gold', () => {
+    expect(nextMedal(withMedals, 500)).toEqual({ medal: 'bronze', at: 700 });
+    expect(nextMedal(withMedals, 832)).toEqual({ medal: 'silver', at: 850 });
+    expect(nextMedal(withMedals, 900)).toEqual({ medal: 'gold', at: 1000 });
+    expect(nextMedal(withMedals, 1000)).toBeNull();
+  });
+
+  it('gives nothing on a config without medals', () => {
+    expect(medalFor(ch, 5000)).toBeNull();
+    expect(nextMedal(ch, 0)).toBeNull();
   });
 });

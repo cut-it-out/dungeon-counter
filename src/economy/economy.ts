@@ -217,6 +217,27 @@ export function summarize(
   };
 }
 
+export type Medal = 'gold' | 'silver' | 'bronze';
+
+// Summary medal for a profit (Session 11); null below bronze or when the config sets no medals.
+export function medalFor(cfg: EconomyConfig, profit: number): Medal | null {
+  const m = cfg.medals;
+  if (!m) return null;
+  if (profit >= m.gold) return 'gold';
+  if (profit >= m.silver) return 'silver';
+  if (profit >= m.bronze) return 'bronze';
+  return null;
+}
+
+// The next medal a profit hasn't reached yet, and its threshold; null at gold or without medals.
+export function nextMedal(cfg: EconomyConfig, profit: number): { medal: Medal; at: number } | null {
+  const m = cfg.medals;
+  if (!m) return null;
+  const order: Medal[] = ['bronze', 'silver', 'gold'];
+  const medal = order.find((name) => profit < m[name]);
+  return medal ? { medal, at: m[medal] } : null;
+}
+
 export function upgrade(state: EconomyState, cfg: EconomyConfig): EconomyEvent | null {
   if (state.finished || !canUpgrade(state, cfg).ok) return null;
   const cost = upgradeCostAt(cfg, state.upgradeLevel);

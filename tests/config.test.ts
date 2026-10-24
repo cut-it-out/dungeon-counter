@@ -2,6 +2,8 @@ import { describe, expect, it } from 'vitest';
 import baseline from '../balancing/configs/baseline-v1.json';
 import challenge from '../src/config/challenge-v1.json';
 import challengeV2 from '../src/config/challenge-v2.json';
+import challengeV4 from '../src/config/challenge-v4.json';
+import challengeV5 from '../src/config/challenge-v5.json';
 import type { EconomyConfig } from '../src/config/types';
 import { validateConfig } from '../src/config/validate';
 
@@ -72,6 +74,19 @@ describe('challenge-v2', () => {
   });
 });
 
+describe('challenge-v5', () => {
+  it('is challenge-v4 with rush 2 at 0.7 s, the last rush at 0.5 s and medals (Session 11), nothing else', () => {
+    const v4 = challengeV4 as EconomyConfig;
+    expect(challengeV5).toEqual({
+      ...v4,
+      id: 'challenge-v5',
+      rushes: [v4.rushes[0], { startS: 150, endS: 175, intervalS: 0.7 }, { startS: 240, endS: 270, intervalS: 0.5 }],
+      medals: { bronze: 700, silver: 850, gold: 1000 },
+    });
+    expect(() => validateConfig(challengeV5 as EconomyConfig)).not.toThrow();
+  });
+});
+
 describe('validateConfig rejects', () => {
   const rush = (startS: number, endS: number, intervalS = 1) => ({ startS, endS, intervalS });
   const cases: [string, Partial<EconomyConfig>, RegExp][] = [
@@ -93,6 +108,8 @@ describe('validateConfig rejects', () => {
     ['a largest crate above shelfCap', { cratesBatchStep: 6 }, /cratesMaxLevel \(23\) must be <= shelfCap/],
     ['a zero calm speed-up', { calmSpeedup: 0 }, /calmSpeedup must be in \(0, 1\]/],
     ['a calm slow-down', { calmSpeedup: 1.2 }, /calmSpeedup must be in \(0, 1\]/],
+    ['medals out of order', { medals: { bronze: 900, silver: 850, gold: 1000 } }, /bronze < silver < gold/],
+    ['a non-integer medal', { medals: { bronze: 700.5, silver: 850, gold: 1000 } }, /medals must be positive integers/],
     ['a zero rush interval', { rushes: [rush(60, 80, 0)] }, /rushes\[0\]\.intervalS must be positive/],
     ['overlapping rushes', { rushes: [rush(60, 80), rush(70, 90)] }, /rushes\[1\] must be sorted/],
     ['a rush past the session end', { rushes: [rush(290, 310)] }, /rushes\[0\] must be sorted/],

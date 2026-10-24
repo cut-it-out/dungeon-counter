@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 import type { EconomyConfig } from '../config/types';
 import { exportCsv } from '../csv/export';
-import { summarize } from '../economy/economy';
+import { medalFor, nextMedal, summarize } from '../economy/economy';
 import type { RunLog } from '../log/eventLog';
 import { browserStorage, recordBest } from '../storage/save';
 import * as overlay from '../ui/overlay';
@@ -18,8 +18,9 @@ export class SummaryScene extends Phaser.Scene {
     const summary = summarize(cfg, data.run.events);
     // Idempotent, so Last summary can show the same run again (Session 6).
     const best = recordBest(browserStorage(), cfg.id, data.run.runId, summary.profit);
+    const medal = { enabled: !!cfg.medals, medal: medalFor(cfg, summary.profit), next: nextMedal(cfg, summary.profit) };
     const show = () =>
-      overlay.showSummary(summary, best, {
+      overlay.showSummary(summary, best, medal, {
         onExport: () => void exportCsv(data.run),
         // The finished log stays saved until replaced (GDD §8), so New day confirms.
         onNewDay: () =>

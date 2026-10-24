@@ -92,3 +92,12 @@ From `run_sql.py` over `balancing/runs/` (5 runs, all complete, all reconcile):
 - The profit gain is mostly more customers: against run-dce4 (+563c), run-e321 spent about the same and earned 223c more, about 147c of it from 11 more sales at 13.4c and the rest from a higher revenue per sale (13.8c). Practice is part of that.
 - The hypothesis (a Brews/Crates mix beats pure Brews in my play) was **not tested**: I played both runs Brews-heavy, with no pure-Brews and no Crates-3 run. The model's mix advantage (92c, ~8%) is smaller than my run-to-run spread (218c on v3), so I can't feel it.
 - Full reading in `balancing/balancing-table.md` §4–6.
+
+## challenge-v5 (Session 11)
+
+- **Changes from challenge-v4:** rush 2 0.8 → **0.7 s**, last rush 0.6 → **0.5 s**, and **medals** bronze 700c / silver 850c / gold 1000c. Arrivals 198 → 212.
+- **Why:** my v4 runs never tested the upgrade choice, and the model's mix advantage on v4 (92c) was smaller than my run-to-run spread. I asked for one more revision that makes the Crates choice noticeable, and picked candidate C from Claude Code's headless comparison (on v4: last rush 0.5 s only, mix +232c but crates-first +131c over brews-only; last rush 0.45 s, +322c but leaning to Crates; Crates +4 per level or 30c, under +140c).
+- **Headless (`npm test`, not evidence):** none 605c (13 missed), brews-only 1199c (13 missed, last rush 47/60), crates-first 1210c, cheaper-first (mix) 1410c, 0 missed.
+- **Medal thresholds:** set from my v4 runs (+776c, +832c): bronze below both, silver just above my best, gold a clearly better day. Re-set them after my v5 runs if they feel wrong.
+- **Hypothesis:** a day with Crates in the mix beats my Brews-heavy habit by a visible margin, and a Brews-heavy day shows it as missed customers in the last rush.
+- **Status:** newest revision, so the default and `?config=revised`. v4 not accepted (superseded).

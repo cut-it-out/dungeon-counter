@@ -8,6 +8,7 @@ import {
   sessionMs,
   upgradeCostAt,
   upgradeSafeAt,
+  type Medal,
   type SessionSummary,
 } from '../economy/economy';
 import type { Availability, BlockReason, EconomyState } from '../economy/types';
@@ -33,6 +34,15 @@ const formatClock = (ms: number) => {
 };
 
 const signed = (coins: number) => `${coins < 0 ? '−' : '+'}${Math.abs(coins)}c`;
+
+const MEDAL_NAMES: Record<Medal, string> = { bronze: 'Bronze', silver: 'Silver', gold: 'Gold' };
+
+// Medal (Session 11): a colored pill plus the next threshold; hidden when the config has no medals.
+export interface MedalInfo {
+  enabled: boolean;
+  medal: Medal | null;
+  next: { medal: Medal; at: number } | null;
+}
 
 // `value` is the action's cost for need_coins, the guard's unlock amount for dead_shop_guard,
 // the current crate size for need_slots and whole seconds left for cooldown.
@@ -66,6 +76,7 @@ export function showTitle(opts: {
   configId: string;
   notice: string | null;
   best: Best | null;
+  bestMedal: Medal | null;
   onContinue: (() => void) | null;
   onLastSummary: (() => void) | null;
   onNewDay: () => void;
@@ -74,7 +85,8 @@ export function showTitle(opts: {
   el('pause-btn').hidden = true;
   setText(el('title-config'), `Config: ${opts.configId}`);
   el('title-best').hidden = !opts.best;
-  setText(el('title-best'), opts.best ? `Best profit ${signed(opts.best.profit)}` : '');
+  const medal = opts.bestMedal ? ` · ${MEDAL_NAMES[opts.bestMedal]}` : '';
+  setText(el('title-best'), opts.best ? `Best profit ${signed(opts.best.profit)}${medal}` : '');
   el('title-notice').hidden = !opts.notice;
   setText(el('title-notice'), opts.notice ?? '');
   for (const [id, handler] of [
@@ -206,11 +218,18 @@ export function hidePause() {
 export function showSummary(
   summary: SessionSummary,
   best: { best: Best; isNew: boolean },
+  medal: MedalInfo,
   handlers: { onExport: () => void; onNewDay: () => void },
 ) {
   showOnly('summary-panel');
   el('pause-btn').hidden = true;
   setText(el('sum-profit'), signed(summary.profit));
+  const pill = el('sum-medal');
+  el('sum-medal-row').hidden = !medal.enabled;
+  pill.hidden = !medal.medal;
+  pill.className = `medal${medal.medal ? ` medal-${medal.medal}` : ''}`;
+  setText(pill, medal.medal ? `${MEDAL_NAMES[medal.medal]} medal` : '');
+  setText(el('sum-medal-next'), medal.next ? `${MEDAL_NAMES[medal.next.medal]} at ${signed(medal.next.at)}` : 'Top medal');
   setText(el('sum-best'), best.isNew ? 'New best!' : `Best ${signed(best.best.profit)}`);
   el('sum-best').classList.toggle('new', best.isNew);
   const spend = (coins: number) => (coins ? `−${coins}c` : '0c');

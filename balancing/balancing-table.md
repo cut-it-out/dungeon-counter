@@ -13,16 +13,17 @@ Played runs are mine (the developer's), free play on the challenge configs and t
 
 ## 1. Configs side by side
 
-| | baseline-v1 (idle loop) | challenge-v1 (frozen) | challenge-v2 | challenge-v3 (mine) | challenge-v4 (default) |
-|---|---|---|---|---|---|
-| Calm interval | 3 s, constant | 4 s, constant | 4 → 3.4 → 2.89 → 2.456 s | 4 → 2.8 → 1.96 → 1.372 s | 4 → 2.68 → 1.796 → 1.203 s |
-| `calmSpeedup` | — | — (1) | 0.85 | 0.7 | 0.67 |
-| Rushes (60–80 / 150–175 / 240–270 s) | none | 1 / 0.75 / 0.6 s | 1 / 0.75 / 0.6 s | 1.2 / 0.8 / 0.65 s | 1.2 / 0.8 / 0.6 s |
-| Arrivals per day | 100 | 158 | 172 | 187 | 198 |
-| Restock | 10c for 5, instant | 10c for 5, 5 s cooldown | same | same | same |
-| Better Brews | 50c ×1.5, +2c | same | same | same | same |
-| Bigger Crates | — | 40c ×1.5, +3 potions, max 3 | same | same | same |
-| Score | closing balance | net profit | net profit | net profit | net profit |
+| | baseline-v1 (idle loop) | challenge-v1 (frozen) | challenge-v2 | challenge-v3 (mine) | challenge-v4 | challenge-v5 (default) |
+|---|---|---|---|---|---|---|
+| Calm interval | 3 s, constant | 4 s, constant | 4 → 3.4 → 2.89 → 2.456 s | 4 → 2.8 → 1.96 → 1.372 s | 4 → 2.68 → 1.796 → 1.203 s | 4 → 2.68 → 1.796 → 1.203 s |
+| `calmSpeedup` | — | — (1) | 0.85 | 0.7 | 0.67 | 0.67 |
+| Rushes (60–80 / 150–175 / 240–270 s) | none | 1 / 0.75 / 0.6 s | 1 / 0.75 / 0.6 s | 1.2 / 0.8 / 0.65 s | 1.2 / 0.8 / 0.6 s | 1.2 / 0.7 / 0.5 s |
+| Arrivals per day | 100 | 158 | 172 | 187 | 198 | 212 |
+| Restock | 10c for 5, instant | 10c for 5, 5 s cooldown | same | same | same | same |
+| Better Brews | 50c ×1.5, +2c | same | same | same | same | same |
+| Bigger Crates | — | 40c ×1.5, +3 potions, max 3 | same | same | same | same |
+| Score | closing balance | net profit | net profit | net profit | net profit | net profit + medal |
+| Medals (bronze / silver / gold) | — | — | — | — | — | 700 / 850 / 1000c |
 
 ## 2. Played runs
 
@@ -48,6 +49,7 @@ The idle-loop profit is closing − 20c start coins, the same definition as the 
 | challenge-v2 | 520c · 2 | **1042c** · 2 | 801c · 0 | 975c · 0 | +67c |
 | challenge-v3 | 565c · 0 | **1257c** · 0 | 986c · 0 | 1055c · 0 | +202c |
 | challenge-v4 | 590c · 4 | 1118c · 4 | 1119c · 0 | **1210c** · 0 | −92c |
+| challenge-v5 | 605c · 13 | 1199c · 13 | 1210c · 0 | **1410c** · 0 | −211c |
 
 All strategies restock whenever the shelf won't cover the customers still to come and stop upgrading 60 s before the end. On v4 brews-only misses 4 customers in the 0.6 s last rush (46/50); the Crates strategies miss none.
 
@@ -70,8 +72,12 @@ All strategies restock whenever the shelf won't cover the customers still to com
 - `elapsed_s` is rounded to 0.1 s in the CSVs, so idle times carry about ±0.1 s.
 - Headless numbers depend on the strategies' rules (restock rule, 60 s upgrade horizon); they compare configs under one fixed model.
 
-## 6. Conclusion
+## 6. Conclusion (before v5)
 
 `challenge-v4` does what the pivot set out to do: the day no longer stalls between rushes (reading 3), the rushes cost sales when I slip (reading 4), the score spreads with how I play and keeps improving with practice (readings 2 and 5), and in the headless model no single upgrade path wins (reading 6). What the data doesn't show is that the Brews/Crates choice matters to a human player: the model's difference is too small to feel. That is the open design question for a next iteration, not a reason to hold v4 back.
+
+## 7. challenge-v5 (Session 11)
+
+I chose one more revision instead of accepting v4. `challenge-v5` = v4 with rush 2 at 0.7 s and the last rush at 0.5 s, so skipping Bigger Crates shows up as missed rush customers: in the headless model brews-only serves the last rush 47/60, and its profit (1199c) sits level with crates-first (1210c) while mixing both makes 1410c, 211c ahead, beyond my ~200c run-to-run spread. Medals arrive with it: bronze 700c, silver 850c, gold 1000c, set from my v4 runs (+776c, +832c), so my best v4 day would just miss silver. Not played yet; the question for my v5 runs is whether a day with Crates in the mix visibly beats my Brews-heavy habit.
 
 Interactive view of the same data: the "Dungeon Counter balancing" dashboard (https://claude.ai/artifact/66FsFzuy6aTUkVfKdNKo7E, private to me unless I share it), fed by `balancing/summary-all.csv` (`run_sql.py --idle --simulated --csv`).
