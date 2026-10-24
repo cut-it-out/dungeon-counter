@@ -18,7 +18,7 @@ Played runs, deviations and config changes, newest last. Numbers come from the C
 - **Hypothesis:** shorter calm gaps later in the day keep me acting between rushes (more sales and decisions per minute in calm stretches 2–4) without changing the rushes themselves. Expected in played runs: shorter action spacing and less idle time after 80 s, higher profit; missed sales in rushes about the same.
 - **Not expected to fix:** the Better Brews dominance seen in the headless strategies.
 - **Headless sanity check (`npm test`, Session 8, not evidence):** profit `challenge-v1` → `challenge-v2`: none 475c → 520c, brews-only 867c → 1042c, crates-first 694c → 801c, cheaper-first 803c → 975c. Arrivals 158 → 172. Brews still dominates.
-- **Status:** not accepted; `REVISED_ACCEPTED` stays `false` until played runs on `?config=revised` support it.
+- **Status:** superseded as the revision candidate by `challenge-v3` (Session 9); still playable as `?config=challenge-v2`. Not accepted.
 
 ## challenge-v3 (Session 9, my hand-made config)
 
