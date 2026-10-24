@@ -75,13 +75,13 @@ describe('challenge-v2', () => {
 });
 
 describe('challenge-v5', () => {
-  it('is challenge-v4 with rush 2 at 0.7 s, the last rush at 0.5 s and medals set from my v5 runs (Session 11), nothing else', () => {
+  it('is challenge-v4 with rush 2 at 0.7 s, the last rush at 0.5 s and my final medal thresholds (Session 12), nothing else', () => {
     const v4 = challengeV4 as EconomyConfig;
     expect(challengeV5).toEqual({
       ...v4,
       id: 'challenge-v5',
       rushes: [v4.rushes[0], { startS: 150, endS: 175, intervalS: 0.7 }, { startS: 240, endS: 270, intervalS: 0.5 }],
-      medals: { bronze: 900, silver: 1050, gold: 1200 },
+      medals: { bronze: 750, silver: 900, gold: 1000 },
     });
     expect(() => validateConfig(challengeV5 as EconomyConfig)).not.toThrow();
   });

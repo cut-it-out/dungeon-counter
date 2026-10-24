@@ -133,7 +133,7 @@ The idle loop was judged solved after a few rounds (build log Session 6), so the
 
 *Session 11:* S15 on v4 ✔ (two runs) and S16 refreshed; at my request one more revision, `challenge-v5` (faster rushes 2–3 so the Crates choice shows), and medals built as per-config thresholds instead of dropped. Left: S15 runs on v5 and a last S16 refresh; S17 docs.
 
-*Final (Session 11):* S15 on v5 ✔ (three runs), S16 ✔ refreshed (§7), `challenge-v5` accepted with medals re-set to 900 / 1050 / 1200c, S17 ✔ (`CREDITS.md` checked against `public/assets/`, candidates deleted, `docs/case-study-notes.md`, `README.md`). Time box: about three days (18–24 h). Not done, by decision: a v6 fix for the Crates-first dead stretch and a late-upgrade hint (next-iteration items in the case study).
+*Final (Session 11):* S15 on v5 ✔ (three runs), S16 ✔ refreshed (§7), `challenge-v5` accepted with medals re-set to 900 / 1050 / 1200c (750 / 900 / 1000c by my hand in Session 12), S17 ✔ (`CREDITS.md` checked against `public/assets/`, candidates deleted, `docs/case-study-notes.md`, `README.md`). Time box: about three days (18–24 h). Not done, by decision: a v6 fix for the Crates-first dead stretch (a next-iteration item in the case study); a late-upgrade hint, left out on purpose as a design stance. Live at https://dungeon-counter.pages.dev/.
 
 ### Day 3 — tuning & portfolio (~8 h)
 

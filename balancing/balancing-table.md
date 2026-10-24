@@ -23,7 +23,7 @@ Played runs are mine (the developer's), free play on the challenge configs and t
 | Better Brews | 50c ×1.5, +2c | same | same | same | same | same |
 | Bigger Crates | — | 40c ×1.5, +3 potions, max 3 | same | same | same | same |
 | Score | closing balance | net profit | net profit | net profit | net profit | net profit + medal |
-| Medals (bronze / silver / gold) | — | — | — | — | — | 900 / 1050 / 1200c |
+| Medals (bronze / silver / gold) | — | — | — | — | — | 750 / 900 / 1000c |
 
 ## 2. Played runs
 
@@ -64,7 +64,7 @@ All strategies restock whenever the shelf won't cover the customers still to com
 4. **The rushes test execution, not just planning.** The headless strategies served every v3 rush customer; I missed 2, 12 and 3 on v3. On v4 I served the 0.6 s last rush 50/50 and 48/50, and missed 2 customers in each run.
 5. **v4 raised my score mainly by adding customers.** My v4 runs made +776c and +832c, against +345c to +563c on v3. Against my best v3 run (run-dce4, +563c), run-e321 spent almost the same (1920c vs 1910c) and earned 223c more revenue: 11 more sales (196 vs 185, from the faster calm stretches) are worth about 147c of that at v3's 13.4c per sale, and a slightly higher revenue per sale (13.8c) the rest. So about two thirds of the gain is the config and one third is how I played, practice included (see Limits).
 6. **The upgrade-choice hypothesis for v4 was not tested in play.** The headless model makes the Brews/Crates mix best on v4 (1210c, against 1118c for brews-only and 1119c for crates-first). I played both v4 runs the same Brews-heavy way as on v3 (Brews 7, Crates 2 and 1), with no pure-Brews and no Crates-3 run, so my runs can't confirm or reject it. Within v4, the run with fewer Crates made more (832c vs 776c), which two runs can't separate from noise. The model's gap between mix and pure Brews (92c, about 8%) is smaller than my own run-to-run spread (218c across the v3 runs), so a player can't feel it: the choice exists in the model, but I never had a reason to try a Crates-heavy day.
-7. **I upgrade too late for the profit score.** My last upgrade came between 255.5 and 273.3 s in every challenge run, inside the last minute, where an upgrade can hardly pay for itself. That is a strategy lesson for me, and it may also be a UI question (nothing on screen says "too late to pay off").
+7. **I upgrade too late for the profit score.** My last upgrade came between 255.5 and 273.3 s in every challenge run, inside the last minute, where an upgrade can hardly pay for itself. That is a strategy lesson for me. An on-screen "too late to pay off" hint was considered and left out on purpose ("deliberately want to leave it out. dont want to spoon feed everything to players").
 
 ## 5. Limits
 
@@ -81,7 +81,7 @@ All strategies restock whenever the shelf won't cover the customers still to com
 
 ## 7. challenge-v5 (Session 11)
 
-I chose one more revision instead of accepting v4. `challenge-v5` = v4 with rush 2 at 0.7 s and the last rush at 0.5 s, so skipping Bigger Crates shows up as missed rush customers: in the headless model brews-only serves the last rush 47/60 and makes 1199c, level with crates-first (1210c), while mixing both makes 1410c. Medals arrived with it (first bronze 700c, silver 850c, gold 1000c, set from my v4 runs; re-set to 900 / 1050 / 1200c after these runs).
+I chose one more revision instead of accepting v4. `challenge-v5` = v4 with rush 2 at 0.7 s and the last rush at 0.5 s, so skipping Bigger Crates shows up as missed rush customers: in the headless model brews-only serves the last rush 47/60 and makes 1199c, level with crates-first (1210c), while mixing both makes 1410c. Medals arrived with it (first bronze 700c, silver 850c, gold 1000c, set from my v4 runs; then 900 / 1050 / 1200c after these runs, and finally 750 / 900 / 1000c by my hand "to be more rewarding to players").
 
 My three v5 runs (§2):
 

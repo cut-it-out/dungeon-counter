@@ -96,7 +96,7 @@ From `run_sql.py` over `balancing/runs/` (5 runs, all complete, all reconcile):
 
 ## challenge-v5 (Session 11)
 
-- **Changes from challenge-v4:** rush 2 0.8 → **0.7 s**, last rush 0.6 → **0.5 s**, and **medals**, first bronze 700c / silver 850c / gold 1000c, re-set after my v5 runs to **900c / 1050c / 1200c**. Arrivals 198 → 212.
+- **Changes from challenge-v4:** rush 2 0.8 → **0.7 s**, last rush 0.6 → **0.5 s**, and **medals**, first bronze 700c / silver 850c / gold 1000c, re-set after my v5 runs to 900c / 1050c / 1200c, then set by hand to **750c / 900c / 1000c** "to be more rewarding to players" (Session 12). Arrivals 198 → 212.
 - **Why:** my v4 runs never tested the upgrade choice, and the model's mix advantage on v4 (92c) was smaller than my run-to-run spread. I asked for one more revision that makes the Crates choice noticeable, and picked candidate C from Claude Code's headless comparison (on v4: last rush 0.5 s only, mix +232c but crates-first +131c over brews-only; last rush 0.45 s, +322c but leaning to Crates; Crates +4 per level or 30c, under +140c).
 - **Headless (`npm test`, not evidence):** none 605c (13 missed), brews-only 1199c (13 missed, last rush 47/60), crates-first 1210c, cheaper-first (mix) 1410c, 0 missed.
 - **Medal thresholds:** set from my v4 runs (+776c, +832c): bronze below both, silver just above my best, gold a clearly better day. Re-set them after my v5 runs if they feel wrong.
@@ -113,5 +113,5 @@ From `run_sql.py` over `balancing/runs/` (5 runs, all complete, all reconcile):
 
 ## Accepted: challenge-v5 (Session 11)
 
-I accept `challenge-v5` as the shipped config ("Keep v5, finish now"), with medals re-set from my v5 runs to bronze 900c / silver 1050c / gold 1200c. Accepted on: pacing (idle 41.5–57.2 s on my non-Crates-first days, against 149.5–171.3 s on v1), rush pressure that shows when I skip Crates (54/60 in run-8391), a score that spreads with how I play, and no single upgrade path winning in the headless model. Known problem kept, not fixed: going Crates first leaves the mid-game with little to do, because a 14-potion crate needs the shelf down to 6 potions (run-7ac0). The candidate fix for a next iteration is Crates +2 per level (largest crate 11), headless brews-only 1199c / crates-first 1235c / mix 1358c. `REVISED_ACCEPTED` already makes v5 the default.
+I accept `challenge-v5` as the shipped config ("Keep v5, finish now"), with medals at bronze 750c / silver 900c / gold 1000c (my final hand-set values, Session 12; 900 / 1050 / 1200c from my v5 runs before that). Accepted on: pacing (idle 41.5–57.2 s on my non-Crates-first days, against 149.5–171.3 s on v1), rush pressure that shows when I skip Crates (54/60 in run-8391), a score that spreads with how I play, and no single upgrade path winning in the headless model. Known problem kept, not fixed: going Crates first leaves the mid-game with little to do, because a 14-potion crate needs the shelf down to 6 potions (run-7ac0). The candidate fix for a next iteration is Crates +2 per level (largest crate 11), headless brews-only 1199c / crates-first 1235c / mix 1358c. `REVISED_ACCEPTED` already makes v5 the default.
 

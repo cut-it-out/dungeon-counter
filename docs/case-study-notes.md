@@ -34,6 +34,8 @@ The brief asked for a five-minute shop sim with one upgrade track, an AI-propose
 
 ## Evidence highlights
 
+![The balancing dashboard: profit per run against the headless strategies, idle time per played run, strategy profit by config, and all runs](dungeon-counter-dashboard-example.png)
+
 Numbers come from `balancing/summary.sql` over the exported runs (`balancing/balancing-table.md`).
 
 - **The slow stretches went away.** No action was available for 149.5 s and 171.3 s of the 300 s day on v1; on v3 to v5 it was 41.5–75.4 s, and the longest wait fell from about 32 s to 4–11 s (except my deliberate Crates-first run, below).
@@ -44,12 +46,13 @@ Numbers come from `balancing/summary.sql` over the exported runs (`balancing/bal
 ## What I would do next
 
 - Shrink the largest crate (Crates +2 per level, largest crate 11), the candidate fix for the Crates-first dead stretch.
-- Tell the player when an upgrade can no longer pay for itself: my last upgrade came in the final minute of every challenge run.
 - Test with other players; every played run here is mine.
+
+**Left out on purpose:** a hint when an upgrade can no longer pay for itself. My last upgrade came in the final minute of every challenge run, where it barely pays back under the profit score. I decided against the hint: "deliberately want to leave it out. dont want to spoon feed everything to players". Working out when to stop investing is part of the game.
 
 ## Where things are
 
-- Play: the Cloudflare Pages build (default config `challenge-v5`; `?config=baseline` plays `challenge-v1`).
+- Play: https://dungeon-counter.pages.dev/ (default config `challenge-v5`; `?config=baseline` plays `challenge-v1`).
 - Design: `docs/GDD-dungeon-counter-v4.md` (v1–v3 kept for provenance).
-- Evidence: `balancing/runs/`, `balancing/summary.sql`, `balancing/balancing-table.md`, `balancing/notes.md`, and the "Dungeon Counter balancing" dashboard (private claude.ai artifact).
+- Evidence: `balancing/runs/`, `balancing/summary.sql`, `balancing/balancing-table.md`, `balancing/notes.md`, and the "Dungeon Counter balancing" dashboard (claude.ai artifact; screenshot in `docs/dungeon-counter-dashboard-example.png`).
 - Process: `docs/buildlog.md`.
