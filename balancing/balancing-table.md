@@ -1,6 +1,6 @@
 # Balancing table — Dungeon Counter (S16)
 
-*24 October 2026 · Session 10 · data from `balancing/runs/`, `balancing/obsolete/idle-loop-runs/` and `balancing/simulated/`*
+*24 October 2026 · Sessions 10–11 (refreshed with my challenge-v4 runs) · data from `balancing/runs/`, `balancing/obsolete/idle-loop-runs/` and `balancing/simulated/`*
 
 Every number below comes from `balancing/summary.sql` and traces to a `run_id`. To refresh after new runs:
 
@@ -35,8 +35,10 @@ Played runs are mine (the developer's), free play on the challenge configs and t
 | run-dce4 | challenge-v3 | +563c | 185 / 2 | 15/16 30/31 46/46 | 20 | 7 / 2 | 32.5 / 263.7 s | 57.3 s | 7.5 s | 10.0 / 30.4 s | 236c → 1201c | true |
 | run-8139 | challenge-v3 | +345c | 175 / 12 | 16/16 30/31 46/46 | 19 | 7 / 2 | 66.4 / 273.3 s | 45.1 s | 7.9 s | 10.3 / 49.0 s | 199c → 1151c | true |
 | run-9f2e | challenge-v3 | +540c | 184 / 3 | 16/16 28/31 46/46 | 25 | 7 / 2 | 32.7 / 265.0 s | 51.8 s | 11.2 s | 8.6 / 26.6 s | 267c → 1193c | true |
+| run-e321 | challenge-v4 | +776c | 196 / 2 | 16/16 31/31 50/50 | 21 | 7 / 2 | 32.5 / 258.8 s | 75.4 s | 10.1 s | 9.7 / 27.2 s | 236c → 1344c | true |
+| run-b981 | challenge-v4 | +832c | 196 / 2 | 16/16 31/31 48/50 | 28 | 7 / 1 | 33.7 / 255.5 s | 48.5 s | 6.3 s | 8.1 / 27.4 s | 273c → 1318c | true |
 
-The idle-loop profit is closing − 20c start coins, the same definition as the challenge score (the idle loop itself showed the closing balance). No played runs on `challenge-v2` or `challenge-v4` yet.
+The idle-loop profit is closing − 20c start coins, the same definition as the challenge score (the idle loop itself showed the closing balance). No played runs on `challenge-v2`. Runs are listed in the order I played them.
 
 ## 3. Headless strategies (profit · missed)
 
@@ -52,22 +54,24 @@ All strategies restock whenever the shelf won't cover the customers still to com
 ## 4. Reading: what the data supports
 
 1. **The idle loop had one outcome.** Both idle-loop runs sold 100/100, restocked 20 times and ended at Better Brews 5. It was rarely short of options (idle 92 s and 21 s: restocking was almost always possible), so its problem was not "nothing to do" but nothing *worth deciding*. That matches my playtest review that started the pivot.
-2. **The challenge loop produces different outcomes from the same player.** Across five challenge runs profit ranges from +345c to +563c and missed sales from 0 to 12, and the lowest-profit run (run-8139) is the one with the late first upgrade (66.4 s) and the most missed rush customers. Decisions and execution now show in the score.
-3. **v1 was slow between rushes; v3 fixed that.** No action was available for 149.5 s and 171.3 s of the 300 s day on v1; on v3 it was 45.1–57.3 s, and the longest stretch with nothing to do fell from 31–34 s to 7.5–11.2 s. This supports the calm speed-up (v2/v3), which came from my "feels slow" playtest note. The mean gap between my actions only moved from 11–12 s to 8.6–10.3 s: I wasn't acting much more often, I was waiting less.
-4. **The rushes test execution, not just planning.** Every headless strategy served every rush customer on v3, but I missed 2, 12 and 3 there. A perfect restocker isn't a good model of rush pressure for a human; my runs are.
-5. **Better Brews dominated v1–v3 in the headless model, and v4 is built to end that.** Brews-only led the best Crates strategy by 64c, 67c and 202c. My own split moved from 6/3 (v1) to 7/2 (v3) Brews/Crates. On v4 my tunes alone (`calmSpeedup` 0.67, last rush 0.6 s) make the mix best (1210c) with the pure strategies level (1118c / 1119c). **This is a model result only:** no played run on v4 exists yet.
-6. **I upgrade too late for the profit score.** My last upgrade came between 256.0 and 273.3 s in every challenge run, inside the last minute, where an upgrade can hardly pay for itself. That is a strategy lesson for me, and it may also be a UI question (nothing on screen says "too late to pay off").
+2. **The challenge loop produces different outcomes from the same player.** Across seven challenge runs profit ranges from +345c to +832c and missed sales from 0 to 12. The lowest-profit run (run-8139) is the one with the late first upgrade (66.4 s) and the most missed customers. Decisions and execution show in the score.
+3. **The calm speed-up fixed the slow stretches.** No action was available for 149.5 s and 171.3 s of the 300 s day on v1; on v3 it was 45.1–57.3 s and on v4 48.5–75.4 s. The longest stretch with nothing to do fell from 31–34 s to 6.3–11.2 s. The mean gap between my actions only moved from 11–12 s to 8.1–10.3 s: I wasn't acting much more often, I was waiting less.
+4. **The rushes test execution, not just planning.** The headless strategies served every v3 rush customer; I missed 2, 12 and 3 on v3. On v4 I served the 0.6 s last rush 50/50 and 48/50, and missed 2 customers in each run.
+5. **v4 raised my score mainly by adding customers.** My v4 runs made +776c and +832c, against +345c to +563c on v3. Against my best v3 run (run-dce4, +563c), run-e321 spent almost the same (1920c vs 1910c) and earned 223c more revenue: 11 more sales (196 vs 185, from the faster calm stretches) are worth about 147c of that at v3's 13.4c per sale, and a slightly higher revenue per sale (13.8c) the rest. So about two thirds of the gain is the config and one third is how I played, practice included (see Limits).
+6. **The upgrade-choice hypothesis for v4 was not tested in play.** The headless model makes the Brews/Crates mix best on v4 (1210c, against 1118c for brews-only and 1119c for crates-first). I played both v4 runs the same Brews-heavy way as on v3 (Brews 7, Crates 2 and 1), with no pure-Brews and no Crates-3 run, so my runs can't confirm or reject it. Within v4, the run with fewer Crates made more (832c vs 776c), which two runs can't separate from noise. The model's gap between mix and pure Brews (92c, about 8%) is smaller than my own run-to-run spread (218c across the v3 runs), so a player can't feel it: the choice exists in the model, but I never had a reason to try a Crates-heavy day.
+7. **I upgrade too late for the profit score.** My last upgrade came between 255.5 and 273.3 s in every challenge run, inside the last minute, where an upgrade can hardly pay for itself. That is a strategy lesson for me, and it may also be a UI question (nothing on screen says "too late to pay off").
 
 ## 5. Limits
 
-- One player (me), 2 idle-loop runs, 2 runs on v1, 3 on v3, none on v2/v4. No statistical claim; these are readings.
+- One player (me): 2 idle-loop runs, 2 runs on v1, 3 on v3, 2 on v4, none on v2. No statistical claim; these are readings.
+- Learning effect: the runs are in the order I played them, and I got better with practice. Improvements from v1 to v3 to v4 mix the config changes with my own practice; reading 5 separates the two only roughly.
 - The revisions change several numbers at once (v3 changed four), so a difference between configs can't be pinned on one parameter.
 - Free play: my strategy changed between runs, deliberately.
 - `elapsed_s` is rounded to 0.1 s in the CSVs, so idle times carry about ±0.1 s.
 - Headless numbers depend on the strategies' rules (restock rule, 60 s upgrade horizon); they compare configs under one fixed model.
 
-## 6. Next
+## 6. Conclusion
 
-Played runs on `challenge-v4` (the default) to test reading 5, then refresh this table. If the mix wins in my runs too, v4 is the candidate to accept; if pure Brews still wins in play, the next revision looks at the Crates side.
+`challenge-v4` does what the pivot set out to do: the day no longer stalls between rushes (reading 3), the rushes cost sales when I slip (reading 4), the score spreads with how I play and keeps improving with practice (readings 2 and 5), and in the headless model no single upgrade path wins (reading 6). What the data doesn't show is that the Brews/Crates choice matters to a human player: the model's difference is too small to feel. That is the open design question for a next iteration, not a reason to hold v4 back.
 
 Interactive view of the same data: the "Dungeon Counter balancing" dashboard (https://claude.ai/artifact/66FsFzuy6aTUkVfKdNKo7E, private to me unless I share it), fed by `balancing/summary-all.csv` (`run_sql.py --idle --simulated --csv`).

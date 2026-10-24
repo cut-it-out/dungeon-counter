@@ -10,6 +10,9 @@ Played runs, deviations and config changes, newest last. Numbers come from the C
 | run-2ccd | baseline-v1 (idle loop, **obsolete**) | 21 Oct 2026 | In `obsolete/idle-loop-runs/`, outside the SQL. Fixed policy. 100 sold / 0 missed, 20 restocks, Brews 5, closing 240c. Before-evidence for the pivot. |
 | run-849f | challenge-v1 | 21 Oct 2026 | Free play. 156 sold / 2 missed, 15 restocks, Brews 6, Crates 3, closing 404c (profit +384c). |
 | run-3f8a | challenge-v1 | 22 Oct 2026 | Free play, on my phone. 158 sold / 0 missed (every rush customer served), 17 restocks, Brews 6, Crates 3, closing 548c (profit +528c). |
+| run-dce4, run-8139, run-9f2e | challenge-v3 | 24 Oct 2026 | Free play; see "First challenge-v3 runs" below. |
+| run-e321 | challenge-v4 | 24 Oct 2026 | Free play. 196 sold / 2 missed, 21 restocks, Brews 7, Crates 2, closing 796c (profit +776c). |
+| run-b981 | challenge-v4 | 24 Oct 2026 | Free play. 196 sold / 2 missed, 28 restocks, Brews 7, Crates 1, closing 852c (profit +832c). |
 
 ## challenge-v2 (Session 8)
 
@@ -82,3 +85,10 @@ From `run_sql.py` over `balancing/runs/` (5 runs, all complete, all reconcile):
 - **S14 candidates, headless on v3 + these tunes (`npm test`-style runs, not evidence):** the tunes alone ended the Better Brews dominance: brews-only 1118c (misses 4 in rush 3), crates-first 1119c, cheaper-first (mixed) **1210c**, none 590c. Every Crates/Brews candidate pushed further: A `cratesBaseCost` 30 → crates-first 1191c vs brews-only 1118c (tips toward Crates); B `cratesBatchStep` 4 → 1052c vs 1118c, mixed 1252c; C `upgradePriceStep` 1 → all profits roughly halve; D `upgradeCostGrowth` 1.7 → brews-only 955c, mixed 1139c. I chose tunes only.
 - **Hypothesis:** with a faster last rush, a player who mixes both upgrades out-earns one who buys only Brews; pure Brews and pure Crates are close. In my runs: a Brews/Crates mix should beat my 7/2 v3 split, with fewer missed sales in rush 3 at Crates level 3.
 - **Status:** the newest revision, so `?config=revised` and the default (no `?config=`) play it (Session 9 rule). Not evidence-accepted.
+
+### challenge-v4 result (Session 11)
+
+- My two v4 runs: +776c and +832c (v3: +345c to +563c), 2 missed each, last rush served 50/50 and 48/50, idle 75.4 s and 48.5 s, Brews 7 with Crates 2 and 1.
+- The profit gain is mostly more customers: against run-dce4 (+563c), run-e321 spent about the same and earned 223c more, about 147c of it from 11 more sales at 13.4c and the rest from a higher revenue per sale (13.8c). Practice is part of that.
+- The hypothesis (a Brews/Crates mix beats pure Brews in my play) was **not tested**: I played both runs Brews-heavy, with no pure-Brews and no Crates-3 run. The model's mix advantage (92c, ~8%) is smaller than my run-to-run spread (218c on v3), so I can't feel it.
+- Full reading in `balancing/balancing-table.md` §4–6.
