@@ -98,11 +98,12 @@ export function confirm(text: string, yesLabel: string, onYes: () => void, onNo:
   el('confirm-no-btn').onclick = onNo;
 }
 
-// Driven by the actual write result; never claims "Saved" after a failed write (GDD §8).
+// Driven by the actual write result (GDD §8), but shown only when a write fails (my direction,
+// Session 10): a highlighted "Not saved" row the player notices; nothing while saving works.
 export function setSaveStatus(saved: boolean | null) {
   const node = el('save-status');
-  setText(node, saved === null ? '' : saved ? '✓ Saved' : 'Not saved');
-  node.classList.toggle('failed', saved === false);
+  node.hidden = saved !== false;
+  setText(node, saved === false ? 'Not saved' : '');
 }
 
 export function showPlay(handlers: {

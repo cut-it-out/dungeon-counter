@@ -247,18 +247,20 @@ button {
   text-align: center;
 }
 
+/* Only shown when saving fails, as a highlighted row; takes no space otherwise. */
 .save-status {
-  min-height: 18px;
-  margin-top: 2px;
-  font-size: 13px;
-  text-align: right;
-  opacity: 0.8;
+  margin-top: 8px;
+  padding: 6px 12px;
+  border-radius: 8px;
+  background: var(--gold);
+  color: var(--ink);
+  font-size: 14px;
+  font-weight: 700;
+  text-align: center;
 }
 
-.save-status.failed {
-  color: var(--gold);
-  font-weight: 700;
-  opacity: 1;
+.save-status[hidden] {
+  display: none;
 }
 
 /* Full-screen modal panels: title, pause, confirm, summary. */
