@@ -1,6 +1,12 @@
 # Dungeon Counter
 
-A five-minute potion-shop game for mobile browsers. Play it at https://dungeon-counter.pages.dev/. Restock before the customer rushes, choose between Better Brews (higher price) and Bigger Crates (more potions per restock), and beat your best profit for a medal. Built with Phaser 3, Vite and TypeScript as an AI-assisted portfolio prototype for a fictional client; see `docs/case-study-notes.md`.
+A five-minute potion-shop game for phones: restock before the customer rushes, choose between Better Brews (higher price) and Bigger Crates (more potions per restock), and beat your best profit for a medal.
+
+**Play it:** https://dungeon-counter.pages.dev
+
+<img src="docs/gameplay_dungeon-counter.gif" alt="Dungeon Counter gameplay: a restock as the first customer rush starts, adventurers buying potions at the counter and a Better Brews upgrade" width="280">
+
+Built with Phaser 3, Vite and TypeScript as an AI-assisted portfolio prototype for a fictional client; see `docs/case-study-notes.md`.
 
 ## Run it
 
