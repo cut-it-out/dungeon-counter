@@ -8,6 +8,8 @@ A five-minute potion-shop game for phones: restock before the customer rushes, c
 
 Built with Phaser 3, Vite and TypeScript as an AI-assisted portfolio prototype for a fictional client; see `docs/case-study-notes.md`.
 
+Case study: https://ndrew.surfingseagullgames.com/work/dungeon-counter/
+
 ## Run it
 
 ```text
