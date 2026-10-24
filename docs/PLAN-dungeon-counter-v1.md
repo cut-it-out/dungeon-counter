@@ -129,6 +129,8 @@ The idle loop was judged solved after a few rounds (build log Session 6), so the
 **P4. Challenge UI.** ✔ `7565500`. Three action buttons, both upgrade lines, rush badge, profit headline and best on summary and title.
 **P5. GDD v4 + this amendment.** ✔ Session 7.
 
+*Status after Session 10:* S10 ✔ (my phone, Session 9) · S13 ✔ `balancing/summary.sql` + `run_sql.py` · S14 ✔ as `challenge-v4` (v2, v3 were my earlier revisions) · S16 ✔ `balancing/balancing-table.md` · from S18, pulled forward: the simulator (`npm run simulate`, CSVs in `balancing/simulated/`) and a dashboard instead of a static chart. Left: S15 played runs on v4, then a refresh of S16; S17 docs; medals.
+
 ### Day 3 — tuning & portfolio (~8 h)
 
 **S11. Deploy to Cloudflare Pages.** P1 **[you]** for the dashboard part

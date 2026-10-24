@@ -69,3 +69,5 @@ All strategies restock whenever the shelf won't cover the customers still to com
 ## 6. Next
 
 Played runs on `challenge-v4` (the default) to test reading 5, then refresh this table. If the mix wins in my runs too, v4 is the candidate to accept; if pure Brews still wins in play, the next revision looks at the Crates side.
+
+Interactive view of the same data: the "Dungeon Counter balancing" dashboard (https://claude.ai/artifact/66FsFzuy6aTUkVfKdNKo7E, private to me unless I share it), fed by `balancing/summary-all.csv` (`run_sql.py --idle --simulated --csv`).
