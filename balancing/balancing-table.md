@@ -91,4 +91,4 @@ My three v5 runs (§2):
 4. **The medals are too easy.** Two of three first v5 runs reached gold (1000c) and the third silver. v5 has 14 more customers than v4 (212 vs 198), which lifted every score; the thresholds came from v4 runs.
 5. **This is the Session 6 "Crates side effect" judged in play:** a 14-potion crate disables Restock from 7 to 20 potions, and with nothing affordable to buy, that reads as dead time, not as a trade-off.
 
-Interactive view of the same data: the "Dungeon Counter balancing" dashboard (https://claude.ai/artifact/66FsFzuy6aTUkVfKdNKo7E, private to me unless I share it), fed by `balancing/summary-all.csv` (`run_sql.py --idle --simulated --csv`).
+Interactive view of the same data: the "Dungeon Counter balancing" dashboard ([link removed], private to me unless I share it), fed by `balancing/summary-all.csv` (`run_sql.py --idle --simulated --csv`).

@@ -44,3 +44,8 @@ The reading of the results is in `balancing/balancing-table.md`; config changes 
 - `docs/buildlog.md`: session-by-session record of how the project was directed
 - `docs/case-study-notes.md`: facts for the portfolio write-up
 - `CREDITS.md`: CC0 art credits
+
+## Licence
+
+The code is released under the MIT License (`LICENSE`). The pixel art is by Kenney and released under CC0 (`CREDITS.md`); it is not covered by the MIT licence and needs no licence to reuse. Phaser, bundled into the built game, is MIT-licensed by its authors.
+
