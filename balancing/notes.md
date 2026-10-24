@@ -75,3 +75,10 @@ From `run_sql.py` over `balancing/runs/` (5 runs, all complete, all reconcile):
 - Rushes still cost me sales on v3 (2, 12 and 3 missed), although every headless strategy serves them all: a human doesn't restock perfectly. run-8139, with its late first upgrade (66.4 s), missed the most and made the least.
 - I moved from 6 Brews / 3 Crates (v1) to 7 / 2 (v3). My last upgrade still lands in the final minute every time.
 - Small samples (2 and 3 runs); a reading, not a significance claim.
+
+## challenge-v4 (Session 10, S14)
+
+- **Changes from challenge-v3 (my tunes):** `calmSpeedup` 0.7 → **0.67** (calm every 4 s → 2.68 s → 1.796 s → 1.203 s); last rush 0.65 s → **0.6 s**. Everything else equals v3. Arrivals 187 → 198.
+- **S14 candidates, headless on v3 + these tunes (`npm test`-style runs, not evidence):** the tunes alone ended the Better Brews dominance: brews-only 1118c (misses 4 in rush 3), crates-first 1119c, cheaper-first (mixed) **1210c**, none 590c. Every Crates/Brews candidate pushed further: A `cratesBaseCost` 30 → crates-first 1191c vs brews-only 1118c (tips toward Crates); B `cratesBatchStep` 4 → 1052c vs 1118c, mixed 1252c; C `upgradePriceStep` 1 → all profits roughly halve; D `upgradeCostGrowth` 1.7 → brews-only 955c, mixed 1139c. I chose tunes only.
+- **Hypothesis:** with a faster last rush, a player who mixes both upgrades out-earns one who buys only Brews; pure Brews and pure Crates are close. In my runs: a Brews/Crates mix should beat my 7/2 v3 split, with fewer missed sales in rush 3 at Crates level 3.
+- **Status:** the newest revision, so `?config=revised` and the default (no `?config=`) play it (Session 9 rule). Not evidence-accepted.

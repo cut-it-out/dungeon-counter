@@ -87,7 +87,7 @@ Title ── New day ──► Play (5:00) ──► Summary ──► New day
 
 ### Config files
 
-`src/config/challenge-v1.json` (frozen baseline) and the revisions `challenge-v2.json` and `challenge-v3.json`. `?config=baseline` plays `challenge-v1`; `?config=revised` plays the newest revision (`challenge-v3`); any full id also works (`?config=challenge-v2`). Since Session 9 the public default (no `?config=`) is the revised config, by the developer's direction and before played runs on it. The v3 idle config is kept unchanged in `balancing/configs/baseline-v1.json` as the reference for its CSVs, and the playable idle build is the git tag `idle-loop-v1`.
+`src/config/challenge-v1.json` (frozen baseline) and the revisions `challenge-v2.json`, `challenge-v3.json` and `challenge-v4.json`. `?config=baseline` plays `challenge-v1`; `?config=revised` plays the newest revision (`challenge-v4`); any full id also works (`?config=challenge-v2`). Since Session 9 the public default (no `?config=`) is the revised config, by the developer's direction and before played runs on it. The v3 idle config is kept unchanged in `balancing/configs/baseline-v1.json` as the reference for its CSVs, and the playable idle build is the git tag `idle-loop-v1`.
 
 ### Frozen AI-proposed baseline: `challenge-v1`
 
@@ -115,6 +115,10 @@ Proposed by Claude Code in Session 6 without simulation, accepted by the develop
 ### Revision: `challenge-v3` (Session 9, made by the developer)
 
 `challenge-v2` with `calmSpeedup` **0.7** (calm 4 s → 2.8 s → 1.96 s → 1.372 s) and slower rushes, **1.2 / 0.8 / 0.65 s**, so the calm and rush speeds are closer: 94 calm + 93 rush = **187** arrivals. Reason: the calm stretches still felt slow on v2, and the developer hoped closer speeds make the normal pace feel better. It is the public default (`?config=revised` and no parameter). Headless strategies serve every rush customer on it, and Better Brews dominates by more than on v1/v2 (`balancing/notes.md`).
+
+### Revision: `challenge-v4` (Session 10)
+
+`challenge-v3` with the developer's tunes `calmSpeedup` **0.67** and a **0.6 s** last rush (198 arrivals). In the headless check these alone end the Better Brews dominance: brews-only 1118c and crates-first 1119c tie, and mixing both upgrades (cheaper-first) makes 1210c. No Crates or Brews number changed; each candidate tested would have tipped the balance toward Crates or halved profits (`balancing/notes.md`). It is the newest revision, so `?config=revised` and the default play it.
 
 ## 6. Telemetry and balancing questions
 

@@ -30,7 +30,7 @@ Phaser 3 + Vite + TypeScript, Vitest for tests (`environment: 'node'`; economy t
 ```
 index.html            Vite entry; overlay root + canvas container
 src/main.ts           Phaser.Game config
-src/config/           EconomyConfig type, validation, challenge-v1.json (frozen), challenge-v2.json, challenge-v3.json (default), selectConfig
+src/config/           EconomyConfig type, validation, challenge-v1.json (frozen), challenge-v2.json, challenge-v3.json, challenge-v4.json (default), selectConfig
 src/economy/          pure TypeScript economy, policy and headless session runner (no Phaser imports)
 src/storage/save.ts   per-config localStorage save
 src/log/eventLog.ts   run_id / run_type / config_id wrapper around economy events

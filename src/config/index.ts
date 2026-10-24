@@ -7,12 +7,12 @@ const modules = import.meta.glob<{ default: EconomyConfig }>('./*.json', { eager
 export const CONFIGS: EconomyConfig[] = Object.values(modules).map((m) => validateConfig(m.default));
 
 // true: with no ?config=, the revised config loads. Set by my direction in Session 9, before played
-// runs on challenge-v3 (see balancing/notes.md); ?config=baseline still plays challenge-v1.
+// runs on the revision (now challenge-v4, see balancing/notes.md); ?config=baseline still plays challenge-v1.
 export const REVISED_ACCEPTED = true;
 
 // ?config= aliases; "revised" is the newest revision candidate (Session 9). Any full id also
 // works (?config=challenge-v2), and the full id is what saves and CSV rows carry.
-const URL_NAMES: Record<string, string> = { baseline: 'challenge-v1', revised: 'challenge-v3' };
+const URL_NAMES: Record<string, string> = { baseline: 'challenge-v1', revised: 'challenge-v4' };
 
 export function selectConfig(
   search: string,
