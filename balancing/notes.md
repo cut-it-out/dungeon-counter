@@ -28,3 +28,10 @@ Played runs, deviations and config changes, newest last. Numbers come from the C
 - **Headless sanity check (`npm test`, Session 9, not evidence):** none 565c, brews-only 1257c, crates-first 986c, cheaper-first 1055c; every strategy serves every rush customer (0 missed). Brews dominates by more than on v1/v2 (brews-only leads cheaper-first by 202c, v1: 64c).
 - **To check in play:** does the day feel less slow, and do the rushes still feel like pressure? My run-3f8a already served every rush customer on v1, whose rushes are faster.
 - **Status:** the public default since Session 9, by my direction, before any played run on it ("also please make the revised as the default to load"). This is not an evidence-based acceptance; `?config=baseline` still plays `challenge-v1`, and `?config=challenge-v2` plays v2.
+
+## S10 phone smoke test (Session 9)
+
+- A full session played and exported on my phone (run-3f8a, `challenge-v1`).
+- Refresh → Continue: "refresh + continue worked well".
+- Dead-shop guard message: "need Nc to stay stocked message is ok".
+- Export on the phone opens the share menu instead of a direct download; the file reached me. Kept unless I decide otherwise.
