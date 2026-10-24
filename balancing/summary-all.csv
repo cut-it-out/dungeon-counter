@@ -24,6 +24,9 @@ sim-brews-only,challenge-v4,simulated,True,1118,2538,380,1040,0,1138,194,4,16/16
 sim-cheaper-first,challenge-v4,simulated,True,1210,2250,190,660,190,1230,198,0,16/16 31/31 50/50,19,5,3,56.0,219.9,249.0,25.1,10.7,25.1,189,1110,22.5,True,dungeon-counter_challenge-v4_simulated_cheaper-first.csv
 sim-crates-first,challenge-v4,simulated,True,1119,1906,190,407,190,1139,198,0,16/16 31/31 50/50,19,4,3,56.0,207.3,212.0,25.1,11.1,29.5,155,962,63.8,True,dungeon-counter_challenge-v4_simulated_crates-first.csv
 sim-none,challenge-v4,simulated,True,590,970,380,0,0,610,194,4,16/16 31/31 46/50,38,0,0,,,57.2,20.0,7.7,20.0,155,350,184.7,True,dungeon-counter_challenge-v4_simulated_none.csv
+run-3556,challenge-v5,played,True,1024,2964,230,1610,100,1044,212,0,16/16 35/35 60/60,23,7,2,26.2,254.2,57.2,5.8,9.1,28.1,229,1540,114.9,True,dungeon-counter_challenge-v5_played_20261024-2206.csv
+run-8391,challenge-v5,played,True,1010,2940,280,1610,40,1030,206,6,16/16 35/35 54/60,28,7,1,35.7,250.6,41.5,4.4,8.1,31.4,261,1440,137.6,True,dungeon-counter_challenge-v5_played_20261024-2224.csv
+run-7ac0,challenge-v5,played,True,918,2908,190,1610,190,938,212,0,16/16 35/35 60/60,19,7,3,40.5,257.4,190.5,24.1,10.0,26.4,245,1528,-115.8,True,dungeon-counter_challenge-v5_played_20261024-2230.csv
 sim-brews-only,challenge-v5,simulated,True,1199,2629,390,1040,0,1219,199,13,16/16 35/35 47/60,39,6,0,63.6,227.1,108.2,20.0,6.5,20.0,233,1207,181.0,True,dungeon-counter_challenge-v5_simulated_brews-only.csv
 sim-cheaper-first,challenge-v5,simulated,True,1410,2460,200,660,190,1430,212,0,16/16 35/35 60/60,20,5,3,56.0,212.7,245.5,25.1,10.3,25.1,189,1260,51.4,True,dungeon-counter_challenge-v5_simulated_cheaper-first.csv
 sim-crates-first,challenge-v5,simulated,True,1210,2260,200,660,190,1230,212,0,16/16 35/35 60/60,20,5,3,56.0,236.1,223.3,23.5,10.3,29.5,155,1260,34.1,True,dungeon-counter_challenge-v5_simulated_crates-first.csv

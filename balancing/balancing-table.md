@@ -38,8 +38,11 @@ Played runs are mine (the developer's), free play on the challenge configs and t
 | run-9f2e | challenge-v3 | +540c | 184 / 3 | 16/16 28/31 46/46 | 25 | 7 / 2 | 32.7 / 265.0 s | 51.8 s | 11.2 s | 8.6 / 26.6 s | 267c → 1193c | true |
 | run-e321 | challenge-v4 | +776c | 196 / 2 | 16/16 31/31 50/50 | 21 | 7 / 2 | 32.5 / 258.8 s | 75.4 s | 10.1 s | 9.7 / 27.2 s | 236c → 1344c | true |
 | run-b981 | challenge-v4 | +832c | 196 / 2 | 16/16 31/31 48/50 | 28 | 7 / 1 | 33.7 / 255.5 s | 48.5 s | 6.3 s | 8.1 / 27.4 s | 273c → 1318c | true |
+| run-3556 | challenge-v5 | +1024c | 212 / 0 | 16/16 35/35 60/60 | 23 | 7 / 2 | 26.2 / 254.2 s | 57.2 s | 5.8 s | 9.1 / 28.1 s | 229c → 1540c | true |
+| run-8391 | challenge-v5 | +1010c | 206 / 6 | 16/16 35/35 54/60 | 28 | 7 / 1 | 35.7 / 250.6 s | 41.5 s | 4.4 s | 8.1 / 31.4 s | 261c → 1440c | true |
+| run-7ac0 | challenge-v5 | +918c | 212 / 0 | 16/16 35/35 60/60 | 19 | 7 / 3 | 40.5 / 257.4 s | 190.5 s | 24.1 s | 10.0 / 26.4 s | 245c → 1528c | true |
 
-The idle-loop profit is closing − 20c start coins, the same definition as the challenge score (the idle loop itself showed the closing balance). No played runs on `challenge-v2`. Runs are listed in the order I played them.
+The idle-loop profit is closing − 20c start coins, the same definition as the challenge score (the idle loop itself showed the closing balance). No played runs on `challenge-v2`. run-7ac0 is my deliberate Crates-first run. Runs are listed in the order I played them.
 
 ## 3. Headless strategies (profit · missed)
 
@@ -78,6 +81,14 @@ All strategies restock whenever the shelf won't cover the customers still to com
 
 ## 7. challenge-v5 (Session 11)
 
-I chose one more revision instead of accepting v4. `challenge-v5` = v4 with rush 2 at 0.7 s and the last rush at 0.5 s, so skipping Bigger Crates shows up as missed rush customers: in the headless model brews-only serves the last rush 47/60, and its profit (1199c) sits level with crates-first (1210c) while mixing both makes 1410c, 211c ahead, beyond my ~200c run-to-run spread. Medals arrive with it: bronze 700c, silver 850c, gold 1000c, set from my v4 runs (+776c, +832c), so my best v4 day would just miss silver. Not played yet; the question for my v5 runs is whether a day with Crates in the mix visibly beats my Brews-heavy habit.
+I chose one more revision instead of accepting v4. `challenge-v5` = v4 with rush 2 at 0.7 s and the last rush at 0.5 s, so skipping Bigger Crates shows up as missed rush customers: in the headless model brews-only serves the last rush 47/60 and makes 1199c, level with crates-first (1210c), while mixing both makes 1410c. Medals arrived with it (bronze 700c, silver 850c, gold 1000c, set from my v4 runs).
+
+My three v5 runs (§2):
+
+1. **Skipping Crates now shows.** With one Crates level (run-8391) I served the last rush 54/60 and missed 6; with two or three (run-3556, run-7ac0) I served it 60/60.
+2. **Crates first made the day boring, and the data agrees with how it felt.** In my deliberate Crates-first run (run-7ac0) no action was available for 190.5 s of the day, against 41.5 s and 57.2 s in the other two, and the longest stretch with nothing to do was 24.1 s (4.4–5.8 s). After rush 2, from 175 to 240 s, 59.3 s of those 65 s were blocked: Restock needed the shelf down to 6 potions for a 14-potion crate (Crates level 3), and the next Better Brews level cost 253c, then 380c. Across the day this "shelf too full for the crate" block made up about 150 s of the 190.5 s. My note while playing: "there was a time during the middle of the game (after 2nd rush) where I felt I could do very little other than restock and wait for money". The headless model had shown the same thing in its idle times (crates-first 223.3 s, cheaper-first 245.5 s, brews-only 108.2 s on v5), but we had compared only profits.
+3. **The Crates-first day also earned the least** (+918c against +1010c and +1024c), although it ended with the most upgrades (Brews 7, Crates 3). In my hands a big crate costs more in waiting than it gains in rush sales.
+4. **The medals are too easy.** Two of three first v5 runs reached gold (1000c) and the third silver. v5 has 14 more customers than v4 (212 vs 198), which lifted every score; the thresholds came from v4 runs.
+5. **This is the Session 6 "Crates side effect" judged in play:** a 14-potion crate disables Restock from 7 to 20 potions, and with nothing affordable to buy, that reads as dead time, not as a trade-off.
 
 Interactive view of the same data: the "Dungeon Counter balancing" dashboard (https://claude.ai/artifact/66FsFzuy6aTUkVfKdNKo7E, private to me unless I share it), fed by `balancing/summary-all.csv` (`run_sql.py --idle --simulated --csv`).

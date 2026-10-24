@@ -13,6 +13,7 @@ Played runs, deviations and config changes, newest last. Numbers come from the C
 | run-dce4, run-8139, run-9f2e | challenge-v3 | 24 Oct 2026 | Free play; see "First challenge-v3 runs" below. |
 | run-e321 | challenge-v4 | 24 Oct 2026 | Free play. 196 sold / 2 missed, 21 restocks, Brews 7, Crates 2, closing 796c (profit +776c). |
 | run-b981 | challenge-v4 | 24 Oct 2026 | Free play. 196 sold / 2 missed, 28 restocks, Brews 7, Crates 1, closing 852c (profit +832c). |
+| run-3556, run-8391, run-7ac0 | challenge-v5 | 24 Oct 2026 | Free play; run-7ac0 is my deliberate Crates-first run. See "challenge-v5 result" below. |
 
 ## challenge-v2 (Session 8)
 
@@ -101,3 +102,11 @@ From `run_sql.py` over `balancing/runs/` (5 runs, all complete, all reconcile):
 - **Medal thresholds:** set from my v4 runs (+776c, +832c): bronze below both, silver just above my best, gold a clearly better day. Re-set them after my v5 runs if they feel wrong.
 - **Hypothesis:** a day with Crates in the mix beats my Brews-heavy habit by a visible margin, and a Brews-heavy day shows it as missed customers in the last rush.
 - **Status:** newest revision, so the default and `?config=revised`. v4 not accepted (superseded).
+
+### challenge-v5 result (Session 11)
+
+- run-3556 +1024c (Brews 7 / Crates 2, 0 missed), run-8391 +1010c (7 / 1, 6 missed, last rush 54/60), run-7ac0 +918c (7 / 3, Crates first, 0 missed).
+- Skipping Crates now shows as missed customers in the last rush (run-8391).
+- My Crates-first run felt like "very little other than restock and wait for money" after rush 2, and the data agrees: idle 190.5 s (others 41.5 s and 57.2 s), longest stretch 24.1 s; 59.3 s of the 65 s calm stretch after rush 2 were blocked because a 14-potion crate needs the shelf down to 6 potions and the next Brews level was out of reach. The headless idle times (crates-first 223.3 s, cheaper-first 245.5 s vs brews-only 108.2 s) had shown it.
+- Medals: two golds and a silver on the first three v5 runs; the thresholds (from v4 runs) are too low for v5's 212 customers.
+- Full reading: `balancing/balancing-table.md` §7.
