@@ -56,3 +56,22 @@ First reading of my two played `challenge-v1` runs (not yet a comparison):
 - No action was available for half the day or more, which matches "the game between the rush sections feels slow".
 - I maxed Bigger Crates in both runs, although the headless strategies make the most profit with Brews only. Whether Crates helped me or cost me is the S14 question.
 - Both last upgrades came after 255 s, inside the last minute, where an upgrade can hardly pay for itself under the profit score.
+
+### First challenge-v3 runs (Session 10)
+
+From `run_sql.py` over `balancing/runs/` (5 runs, all complete, all reconcile):
+
+| | run-849f v1 | run-3f8a v1 | run-dce4 v3 | run-8139 v3 | run-9f2e v3 |
+|---|---|---|---|---|---|
+| Profit | +384c | +528c | +563c | +345c | +540c |
+| Missed (rushes served) | 2 (20/20 33/33 49/50) | 0 (20/20 33/33 50/50) | 2 (15/16 30/31 46/46) | 12 (16/16 30/31 46/46) | 3 (16/16 28/31 46/46) |
+| Brews / Crates | 6 / 3 | 6 / 3 | 7 / 2 | 7 / 2 | 7 / 2 |
+| First / last upgrade | 25.5 / 260.6 s | 32.7 / 256.0 s | 32.5 / 263.7 s | 66.4 / 273.3 s | 32.7 / 265.0 s |
+| Idle | 149.5 s | 171.3 s | 57.3 s | 45.1 s | 51.8 s |
+| Longest idle stretch | 33.5 s | 31.4 s | 7.5 s | 7.9 s | 11.2 s |
+| Mean gap between my actions | 12.0 s | 11.1 s | 10.0 s | 10.3 s | 8.6 s |
+
+- The calm stretches no longer stall the day: idle time fell from 150–171 s on v1 to 45–57 s on v3, and the longest stretch with nothing to do from ~32 s to 8–11 s. This supports the v2/v3 hypothesis.
+- Rushes still cost me sales on v3 (2, 12 and 3 missed), although every headless strategy serves them all: a human doesn't restock perfectly. run-8139, with its late first upgrade (66.4 s), missed the most and made the least.
+- I moved from 6 Brews / 3 Crates (v1) to 7 / 2 (v3). My last upgrade still lands in the final minute every time.
+- Small samples (2 and 3 runs); a reading, not a significance claim.
