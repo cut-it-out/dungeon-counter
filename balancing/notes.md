@@ -35,3 +35,24 @@ Played runs, deviations and config changes, newest last. Numbers come from the C
 - Refresh → Continue: "refresh + continue worked well".
 - Dead-shop guard message: "need Nc to stay stocked message is ok".
 - Export on the phone opens the share menu instead of a direct download; the file reached me. Kept unless I decide otherwise.
+
+## S13 summary query (Session 10)
+
+`uv run --with duckdb balancing/run_sql.py` prints one block per run in `balancing/runs/*.csv` (`--csv` for CSV; a glob argument reads other CSVs). The query is `balancing/summary.sql`; config constants come from `src/config/*.json`. Checked against the headless strategies: on all 12 strategy runs (4 strategies × 3 configs) profit, missed sales, rush service and reconciliation match `npm test` exactly, and idle time matches within the CSV's 0.1 s rounding.
+
+First reading of my two played `challenge-v1` runs (not yet a comparison):
+
+| | run-849f | run-3f8a (phone) |
+|---|---|---|
+| Profit | +384c | +528c |
+| Missed (rushes served) | 2 (20/20 33/33 49/50) | 0 (20/20 33/33 50/50) |
+| Brews / Crates level | 6 / 3 | 6 / 3 |
+| First / last upgrade | 25.5 s / 260.6 s | 32.7 s / 256.0 s |
+| Idle (no action available) | 149.5 s | 171.3 s |
+| Longest idle stretch | 33.5 s | 31.4 s |
+| Mean / longest gap between my actions | 12.0 s / 37.8 s | 11.1 s / 32.0 s |
+| Revenue minute 2 → minute 5 | 200c → 876c | 252c → 917c |
+
+- No action was available for half the day or more, which matches "the game between the rush sections feels slow".
+- I maxed Bigger Crates in both runs, although the headless strategies make the most profit with Brews only. Whether Crates helped me or cost me is the S14 question.
+- Both last upgrades came after 255 s, inside the last minute, where an upgrade can hardly pay for itself under the profit score.
