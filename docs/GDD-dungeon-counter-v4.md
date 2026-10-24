@@ -240,4 +240,4 @@ The v1 → v2 and v2 → v3 change logs and the Session 4 amendments are in `doc
 
 ---
 
-**Review status:** v4, written after the pivot was implemented (Session 7), so it describes the build. The strategy numbers in §6 are headless sanity checks; no played evidence on the challenge configs exists yet.
+**Review status:** v4, written after the pivot was implemented (Session 7), so it describes the build; revisions v2–v5 and medals were added in Sessions 8–11. The strategy numbers are headless sanity checks; played evidence (nine runs by the developer) is in `balancing/runs/` and read in `balancing/balancing-table.md`.

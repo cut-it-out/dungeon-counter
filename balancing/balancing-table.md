@@ -74,7 +74,7 @@ All strategies restock whenever the shelf won't cover the customers still to com
 
 ## 6. Conclusion (before v5)
 
-`challenge-v4` does what the pivot set out to do: the day no longer stalls between rushes (reading 3), the rushes cost sales when I slip (reading 4), the score spreads with how I play and keeps improving with practice (readings 2 and 5), and in the headless model no single upgrade path wins (reading 6). What the data doesn't show is that the Brews/Crates choice matters to a human player: the model's difference is too small to feel. That is the open design question for a next iteration, not a reason to hold v4 back.
+`challenge-v4` does what the pivot set out to do: the day no longer stalls between rushes (reading 3), the rushes cost sales when I slip (reading 4), the score spreads with how I play and keeps improving with practice (readings 2 and 5), and in the headless model no single upgrade path wins (reading 6). What the data doesn't show is that the Brews/Crates choice matters to a human player: the model's difference is too small to feel. Claude Code read that as a question for a next iteration rather than a reason to hold v4 back; I chose to answer it now with one more revision (§7).
 
 ## 7. challenge-v5 (Session 11)
 
