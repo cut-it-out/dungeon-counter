@@ -19,17 +19,6 @@ Licence for every file below: **Creative Commons Zero (CC0 1.0)**, http://creati
 
 The Roguelike/RPG Pack's `License.txt` also credits Lynn Evers ("with help by").
 
-## Unused alternatives (`public/assets/candidates/`, to be deleted at clean-up)
-
-| File | Creator | Pack | Source tile | URL |
-|---|---|---|---|---|
-| `floor-stone.png` | Kenney | Roguelike/RPG Pack 1.0 | 6,2 | https://kenney.nl/assets/roguelike-rpg-pack |
-| `awning-green.png` | Kenney | Roguelike/RPG Pack 1.0 | 11,0–11,1 | https://kenney.nl/assets/roguelike-rpg-pack |
-| `potion-green.png` | Kenney | Roguelike/RPG Pack 1.0 | 54,12 | https://kenney.nl/assets/roguelike-rpg-pack |
-| `potion-orange.png` | Kenney | Roguelike/RPG Pack 1.0 | 55,11 | https://kenney.nl/assets/roguelike-rpg-pack |
-| `coin-pile.png` | Kenney | Roguelike/RPG Pack 1.0 | 41,11 | https://kenney.nl/assets/roguelike-rpg-pack |
-| `_contact-sheet.png` | Kenney tiles, arranged by Claude Code | (preview of the candidates above) | — | — |
-
 The UI Pack 2.0 (https://kenney.nl/assets/ui-pack, CC0) was downloaded and its licence checked, but nothing from it is used.
 
 ## Fonts and code

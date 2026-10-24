@@ -22,5 +22,5 @@
   "cratesCostGrowth": 1.5,
   "cratesBatchStep": 3,
   "cratesMaxLevel": 3,
-  "medals": { "bronze": 700, "silver": 850, "gold": 1000 }
+  "medals": { "bronze": 900, "silver": 1050, "gold": 1200 }
 }

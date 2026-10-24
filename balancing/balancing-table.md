@@ -23,7 +23,7 @@ Played runs are mine (the developer's), free play on the challenge configs and t
 | Better Brews | 50c ×1.5, +2c | same | same | same | same | same |
 | Bigger Crates | — | 40c ×1.5, +3 potions, max 3 | same | same | same | same |
 | Score | closing balance | net profit | net profit | net profit | net profit | net profit + medal |
-| Medals (bronze / silver / gold) | — | — | — | — | — | 700 / 850 / 1000c |
+| Medals (bronze / silver / gold) | — | — | — | — | — | 900 / 1050 / 1200c |
 
 ## 2. Played runs
 
@@ -81,7 +81,7 @@ All strategies restock whenever the shelf won't cover the customers still to com
 
 ## 7. challenge-v5 (Session 11)
 
-I chose one more revision instead of accepting v4. `challenge-v5` = v4 with rush 2 at 0.7 s and the last rush at 0.5 s, so skipping Bigger Crates shows up as missed rush customers: in the headless model brews-only serves the last rush 47/60 and makes 1199c, level with crates-first (1210c), while mixing both makes 1410c. Medals arrived with it (bronze 700c, silver 850c, gold 1000c, set from my v4 runs).
+I chose one more revision instead of accepting v4. `challenge-v5` = v4 with rush 2 at 0.7 s and the last rush at 0.5 s, so skipping Bigger Crates shows up as missed rush customers: in the headless model brews-only serves the last rush 47/60 and makes 1199c, level with crates-first (1210c), while mixing both makes 1410c. Medals arrived with it (first bronze 700c, silver 850c, gold 1000c, set from my v4 runs; re-set to 900 / 1050 / 1200c after these runs).
 
 My three v5 runs (§2):
 
