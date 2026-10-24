@@ -1,7 +1,8 @@
 -- S13 balancing summary (plan S13, GDD v4 §6). One row per run in balancing/runs/*.csv.
 -- Run from the repo root: uv run --with duckdb balancing/run_sql.py
--- Config constants come from src/config/*.json, joined on config_id. The idle-loop runs in
--- balancing/obsolete/ are outside the glob on purpose.
+-- Config constants come from src/config/*.json and balancing/configs/*.json, joined on config_id.
+-- The idle-loop runs in balancing/obsolete/ and the headless runs in balancing/simulated/ are
+-- outside the default glob on purpose; run_sql.py reads them only when asked (--idle, --simulated).
 --
 -- State is constant between rows (every coin or stock change is a row), so availability over
 -- the gap to the next row follows from the row's state and the config, except for the restock
@@ -10,7 +11,18 @@
 -- 0.05 s of rounding.
 
 WITH cfg AS (
-  SELECT * FROM read_json_auto('src/config/*.json', union_by_name = true)
+  -- The idle loop's baseline-v1 has no cooldown, rushes or Bigger Crates: neutral defaults
+  -- (cooldown 0, no rush windows, Crates never available).
+  SELECT
+    id, startCoins, shelfCap, restockCost, restockBatch, salePrice,
+    upgradeBaseCost, upgradeCostGrowth, upgradePriceStep,
+    coalesce(restockCooldown, 0) AS restockCooldown,
+    coalesce(rushes, []) AS rushes,
+    coalesce(cratesBaseCost, 0) AS cratesBaseCost,
+    coalesce(cratesCostGrowth, 1) AS cratesCostGrowth,
+    coalesce(cratesBatchStep, 0) AS cratesBatchStep,
+    coalesce(cratesMaxLevel, 0) AS cratesMaxLevel
+  FROM read_json_auto(['src/config/*.json', 'balancing/configs/*.json'], union_by_name = true)
 ),
 raw AS (
   -- seq keeps file order: a sale, a restock and session_end can share one elapsed_s.
@@ -21,7 +33,8 @@ rows AS (
   SELECT
     r.filename, r.seq, r.run_id, r.run_type, r.config_id, r.elapsed_s, r.event, r.amount, r.coins, r.stock,
     r.upgrade_level AS brews,
-    coalesce(r.crate_level, 0) AS crates,
+    -- Idle-loop CSVs have no crate_level column at all; read it by name so they still load.
+    coalesce(CAST(json_extract_string(to_json(r), '$.crate_level') AS INTEGER), 0) AS crates,
     LEAD(r.elapsed_s) OVER (PARTITION BY r.filename ORDER BY r.seq) AS next_s,
     max(CASE WHEN r.event = 'restock' THEN r.elapsed_s END)
       OVER (PARTITION BY r.filename ORDER BY r.seq ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)
